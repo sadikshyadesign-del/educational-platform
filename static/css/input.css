@@ -333,6 +333,124 @@
   }
 }
 
+.student-page {
+  background-color: var(--color-ivory);
+  color: var(--color-navy);
+}
+
+.student-page .bg-white {
+  background-color: #fff;
+}
+
+.student-page .bg-gray-50,
+.student-page .bg-gray-50\/50 {
+  background-color: #fbfaf8;
+}
+
+.student-page .bg-gray-100 {
+  background-color: #f3f0e8;
+}
+
+.student-page .border-gray-100,
+.student-page .border-gray-200,
+.student-page .border-gray-300 {
+  border-color: var(--color-hairline);
+}
+
+.student-page .text-gray-900,
+.student-page .text-gray-800,
+.student-page .text-slate-900 {
+  color: var(--color-navy);
+}
+
+.student-page .text-gray-700,
+.student-page .text-gray-600 {
+  color: var(--color-slate-secondary);
+}
+
+.student-page .text-gray-500 {
+  color: var(--color-slate-muted);
+}
+
+.student-page .bg-indigo-600 {
+  background-color: var(--color-navy);
+}
+
+.student-page .bg-indigo-50 {
+  background-color: #f7f3eb;
+}
+
+.student-page .bg-indigo-100 {
+  background-color: #efe7d8;
+}
+
+.student-page .border-indigo-200 {
+  border-color: #d0b582;
+}
+
+.student-page .text-indigo-600,
+.student-page .text-indigo-700 {
+  color: var(--color-bronze-text);
+}
+
+.student-page .hover\:bg-indigo-700:hover {
+  background-color: var(--color-navy-hover);
+}
+
+.student-page .hover\:text-indigo-700:hover {
+  color: var(--color-bronze-text);
+}
+
+.dark .student-page {
+  background-color: #020617;
+  color: #f1f5f9;
+}
+
+.dark .student-page .bg-white,
+.dark .student-page .bg-gray-900 {
+  background-color: #0f1728;
+}
+
+.dark .student-page .bg-gray-800,
+.dark .student-page .bg-gray-50,
+.dark .student-page .bg-gray-100,
+.dark .student-page .bg-gray-50\/50 {
+  background-color: #17263d;
+}
+
+.dark .student-page .border-gray-100,
+.dark .student-page .border-gray-200,
+.dark .student-page .border-gray-300 {
+  border-color: #334155;
+}
+
+.dark .student-page .text-gray-900,
+.dark .student-page .text-gray-800,
+.dark .student-page .text-slate-900 {
+  color: #f8fafc;
+}
+
+.dark .student-page .text-gray-700,
+.dark .student-page .text-gray-600 {
+  color: #cbd5e1;
+}
+
+.dark .student-page .text-gray-500,
+.dark .student-page .text-gray-400 {
+  color: #94a3b8;
+}
+
+.dark .student-page .text-indigo-600,
+.dark .student-page .text-indigo-700,
+.dark .student-page .dark\:text-indigo-400 {
+  color: var(--color-bronze-dark);
+}
+
+.dark .student-page .bg-indigo-50,
+.dark .student-page .bg-indigo-100 {
+  background-color: #2b2b2a;
+}
+
 .auth-page .auth-brand-panel {
   border: 1px solid rgba(244, 240, 232, 0.12);
   background:
