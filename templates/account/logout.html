@@ -3,14 +3,14 @@
 {% block title %}Sign Out — {{ site_settings.site_name }}{% endblock title %}
 
 {% block content %}
-<div class="min-h-[70vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<div class="auth-page min-h-[70vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
   <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
     <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 mb-4">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
       </svg>
     </div>
-    <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white font-display tracking-tight">
+    <h1 class="auth-heading text-3xl font-extrabold text-slate-900 dark:text-white font-display tracking-tight">
       Sign Out
     </h1>
     <p class="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -19,7 +19,7 @@
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="card-surface py-8 px-6 shadow-sm border border-slate-200/80 dark:border-slate-800 rounded-3xl sm:px-10">
+    <div class="auth-card card-surface py-8 px-6 sm:px-10">
       <form method="post" action="{% url 'account_logout' %}">
         {% csrf_token %}
         <div class="flex flex-col sm:flex-row gap-3">

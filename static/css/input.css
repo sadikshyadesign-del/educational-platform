@@ -332,3 +332,122 @@
     text-decoration: underline !important;
   }
 }
+
+.auth-page .auth-brand-panel {
+  border: 1px solid rgba(244, 240, 232, 0.12);
+  background:
+    radial-gradient(circle at 88% 12%, rgba(208, 181, 130, 0.16), transparent 30%),
+    #202833;
+  color: var(--color-ivory);
+}
+
+.auth-page .auth-card {
+  border: 1px solid var(--color-hairline);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 22px 60px -40px rgba(23, 38, 61, 0.42);
+}
+
+.dark .auth-page .auth-card {
+  border-color: #334155;
+  background: #0f1728;
+}
+
+.auth-page .auth-heading {
+  color: var(--color-navy);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+.dark .auth-page .auth-heading {
+  color: #fff;
+}
+
+.auth-page .auth-field {
+  border-color: var(--color-hairline);
+  border-radius: 12px;
+  background: #fbfaf8;
+  color: var(--color-navy);
+}
+
+.dark .auth-page .auth-field {
+  border-color: #475569;
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.auth-page .auth-field:focus {
+  border-color: var(--color-focus-ring);
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(82 111 196 / 22%);
+}
+
+.auth-page .auth-primary {
+  border: 1px solid var(--color-navy);
+  border-radius: 999px;
+  background: var(--color-navy);
+  color: #fff;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.auth-page .auth-primary:hover {
+  border-color: var(--color-navy-hover);
+  background: var(--color-navy-hover);
+}
+
+.auth-page .auth-primary:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.dark .auth-page .dark\:text-indigo-400 {
+  color: var(--color-bronze-dark);
+}
+
+.auth-page a:not(.auth-primary):not([class*="btn-"]) {
+  color: var(--color-bronze-text);
+}
+
+.auth-page a:not(.auth-primary):not([class*="btn-"]):hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-page .bg-indigo-600 {
+  background-color: var(--color-navy);
+}
+
+.auth-page .text-indigo-600 {
+  color: var(--color-bronze-text);
+}
+
+.auth-page .bg-indigo-50 {
+  background-color: #f7f3eb;
+}
+
+.legal-page {
+  color: var(--color-navy);
+}
+
+.legal-page .legal-card {
+  border: 1px solid var(--color-hairline);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 22px 60px -40px rgba(23, 38, 61, 0.36);
+}
+
+.dark .legal-page .legal-card {
+  border-color: #334155;
+  background: #0f1728;
+  color: #cbd5e1;
+}
+
+.legal-page .legal-heading {
+  color: var(--color-navy);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.dark .legal-page .legal-heading {
+  color: #fff;
+}
