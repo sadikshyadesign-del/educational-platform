@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50 text-gray-900 antialiased">
+<html lang="en" class="{% block html_class %}h-full bg-ivory text-navy antialiased{% endblock html_class %}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,7 +15,9 @@
   <link rel="alternate icon" href="{% static 'favicon.ico' %}">
 
   <!-- Early Theme Controller: Prevents Flash of Unstyled Theme (FOUC) without inline script -->
-  <script src="{% static 'js/theme.js' %}"></script>
+  {% block theme_controller %}
+    <script src="{% static 'js/theme.js' %}"></script>
+  {% endblock theme_controller %}
 
   <!-- SEO & Social Meta Tags -->
   <meta name="csrf-token" content="{{ csrf_token }}">
@@ -43,17 +45,19 @@
 
   {% block extra_head %}{% endblock extra_head %}
 </head>
-<body class="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-150">
+<body class="{% block body_class %}min-h-full flex flex-col bg-ivory dark:bg-slate-950 text-navy dark:text-slate-100 font-sans transition-colors duration-150{% endblock body_class %}">
   <!-- Accessibility: Skip to Content Link -->
   <a
     href="#main-content"
-    class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-indigo-600 text-white px-4 py-2 rounded-md shadow-lg outline-none ring-2 ring-indigo-400"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 rounded-full bg-navy px-4 py-2 text-white shadow-lg outline-none ring-2 ring-bronze-dark"
   >
     Skip to main content
   </a>
 
   <!-- Global Navigation Header -->
-  {% include "includes/navbar.html" %}
+  {% block site_header %}
+    {% include "includes/navbar.html" %}
+  {% endblock site_header %}
 
   <!-- Dismissible Messages & Toasts -->
   {% include "includes/messages.html" %}
@@ -64,7 +68,9 @@
   </main>
 
   <!-- Global Footer -->
-  {% include "includes/footer.html" %}
+  {% block site_footer %}
+    {% include "includes/footer.html" %}
+  {% endblock site_footer %}
 
   <!-- Accessible Components Controller -->
   <script src="{% static 'js/components.js' %}" defer></script>
