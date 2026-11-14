@@ -451,6 +451,151 @@
   background-color: #2b2b2a;
 }
 
+.teacher-portal {
+  color: var(--color-navy);
+}
+
+.teacher-portal .bg-white {
+  background-color: #fff;
+}
+
+.teacher-portal .bg-slate-50,
+.teacher-portal .bg-slate-50\/50,
+.teacher-portal .bg-slate-50\/70 {
+  background-color: #fbfaf8;
+}
+
+.teacher-portal .bg-slate-100 {
+  background-color: #f3f0e8;
+}
+
+.teacher-portal .border-slate-100,
+.teacher-portal .border-slate-200,
+.teacher-portal .border-slate-300 {
+  border-color: var(--color-hairline);
+}
+
+.teacher-portal .text-slate-900 {
+  color: var(--color-navy);
+}
+
+.teacher-portal .text-slate-700,
+.teacher-portal .text-slate-600 {
+  color: var(--color-slate-secondary);
+}
+
+.teacher-portal .text-slate-500 {
+  color: var(--color-slate-muted);
+}
+
+.teacher-portal .bg-indigo-600 {
+  background-color: var(--color-navy);
+}
+
+.teacher-portal .bg-indigo-50,
+.teacher-portal .bg-indigo-50\/50 {
+  background-color: #f7f3eb;
+}
+
+.teacher-portal .bg-indigo-100 {
+  background-color: #efe7d8;
+}
+
+.teacher-portal .border-indigo-200,
+.teacher-portal .hover\:border-indigo-300:hover {
+  border-color: #d0b582;
+}
+
+.teacher-portal .text-indigo-600,
+.teacher-portal .text-indigo-700 {
+  color: var(--color-bronze-text);
+}
+
+.teacher-portal .hover\:bg-indigo-700:hover {
+  background-color: var(--color-navy-hover);
+}
+
+.teacher-portal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.teacher-portal textarea,
+.teacher-portal select {
+  border-color: var(--color-hairline);
+  border-radius: 12px;
+  background-color: #fbfaf8;
+  color: var(--color-navy);
+}
+
+.teacher-portal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):focus,
+.teacher-portal textarea:focus,
+.teacher-portal select:focus {
+  border-color: var(--color-focus-ring);
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(82 111 196 / 22%);
+}
+
+.teacher-portal table thead {
+  background-color: #f7f3eb;
+  color: var(--color-navy);
+}
+
+.dark .teacher-portal .bg-white,
+.dark .teacher-portal .bg-slate-900 {
+  background-color: #0f1728;
+}
+
+.dark .teacher-portal .bg-slate-800,
+.dark .teacher-portal .bg-slate-50,
+.dark .teacher-portal .bg-slate-50\/50,
+.dark .teacher-portal .bg-slate-50\/70,
+.dark .teacher-portal .bg-slate-100 {
+  background-color: #17263d;
+}
+
+.dark .teacher-portal .border-slate-100,
+.dark .teacher-portal .border-slate-200,
+.dark .teacher-portal .border-slate-300 {
+  border-color: #334155;
+}
+
+.dark .teacher-portal .text-slate-900 {
+  color: #f8fafc;
+}
+
+.dark .teacher-portal .text-slate-700,
+.dark .teacher-portal .text-slate-600 {
+  color: #cbd5e1;
+}
+
+.dark .teacher-portal .text-slate-500,
+.dark .teacher-portal .text-slate-400 {
+  color: #94a3b8;
+}
+
+.dark .teacher-portal .text-indigo-600,
+.dark .teacher-portal .text-indigo-700,
+.dark .teacher-portal .dark\:text-indigo-400,
+.dark .teacher-portal .dark\:text-indigo-300 {
+  color: var(--color-bronze-dark);
+}
+
+.dark .teacher-portal .bg-indigo-50,
+.dark .teacher-portal .bg-indigo-50\/50,
+.dark .teacher-portal .bg-indigo-100 {
+  background-color: #2b2b2a;
+}
+
+.dark .teacher-portal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.dark .teacher-portal textarea,
+.dark .teacher-portal select {
+  border-color: #475569;
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+.dark .teacher-portal table thead {
+  background-color: #17263d;
+  color: #f8fafc;
+}
+
 .auth-page .auth-brand-panel {
   border: 1px solid rgba(244, 240, 232, 0.12);
   background:
