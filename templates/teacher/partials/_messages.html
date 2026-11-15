@@ -1,0 +1,3 @@
+{% if messages %}<div class="sp-toasts" aria-live="polite">{% for m in messages %}
+  <div class="sp-toast sp-toast--{{ m.level_tag|default:'info' }}" role="status"><span>{{ m }}</span><button type="button" class="sp-toast-x" aria-label="Dismiss" data-sp-dismiss>&times;</button></div>
+{% endfor %}</div>{% endif %}

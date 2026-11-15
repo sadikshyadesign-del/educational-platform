@@ -1,0 +1,49 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Teacher Portal{% endblock %} · Suren Sir</title>
+<script>try{var t=localStorage.getItem("sp-theme");if(t)document.documentElement.setAttribute("data-sp-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
+<link rel="stylesheet" href="{% static 'teacher/css/admin-figma.css' %}">
+{# Keep your CURRENT Tailwind <link>/<script> here until every page is converted, then delete this block. #}
+{% block legacy_head %}{% endblock %}
+{% block extra_head %}{% endblock %}
+</head>
+<body class="sp">
+{% include "teacher/partials/_icons.html" %}
+<a class="sp-skip" href="#sp-content">Skip to content</a>
+<div class="sp-shell">
+  {% include "teacher/partials/_sidebar.html" %}
+  <div class="sp-scrim" data-sp-close></div>
+  <main class="sp-main" id="sp-content">
+    <div class="sp-topbar">
+      <button type="button" class="sp-iconbtn" data-sp-open aria-label="Open menu"><svg class="sp-i" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <strong>Suren Sir</strong>
+    </div>
+    <header class="sp-head">
+      <div class="sp-head-txt">
+        <h1>{% block page_title %}Overview{% endblock %}</h1>
+        <p class="sp-sub">{% block page_subtitle %}{% endblock %}</p>
+      </div>
+      <div class="sp-head-act">{% block header_actions %}{% endblock %}</div>
+    </header>
+    {% include "teacher/partials/_messages.html" %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<dialog class="sp-dialog" id="sp-confirm" aria-labelledby="sp-confirm-h">
+  <form method="dialog">
+    <h2 id="sp-confirm-h">Are you sure?</h2>
+    <p id="sp-confirm-msg"></p>
+    <div class="sp-actions">
+      <button class="sp-btn sp-btn--secondary" value="no">Cancel</button>
+      <button class="sp-btn sp-btn--danger" value="yes" id="sp-confirm-yes">Delete</button>
+    </div>
+  </form>
+</dialog>
+<script src="{% static 'teacher/js/admin-figma.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

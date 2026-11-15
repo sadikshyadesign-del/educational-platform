@@ -1,0 +1,51 @@
+{% comment %}
+CONFIG: put YOUR url names between the quotes below (the same names you use in {% url %} today).
+A wrong name never crashes the page; that link simply shows "#" until you fix it.
+Adding a new menu item later = one {% url %} line + one include line.
+{% endcomment %}
+{% url 'dashboard:teacher' as u_overview %}
+{% url 'dashboard:teacher_courses' as u_courses %}
+{% url 'dashboard:teacher_materials' as u_materials %}
+{% url 'dashboard:teacher_enrollments' as u_enrollments %}
+{% url 'dashboard:teacher_submissions' as u_submissions %}
+{% url 'dashboard:teacher_permissions' as u_permissions %}
+{% url 'dashboard:teacher_students' as u_students %}
+{% url 'dashboard:teacher_settings' as u_settings %}
+{% url 'dashboard:teacher_faqs' as u_faqs %}
+{% url 'admin:index' as u_admin %}
+{% url 'core:home' as u_home %}
+{% url 'account_logout' as u_logout %}
+<aside class="sp-side" aria-label="Teacher navigation" id="sp-side">
+  <div class="sp-brand"><strong>Suren Sir</strong><span>Admin dashboard</span></div>
+  <nav class="sp-nav">
+    <ul style="list-style:none;margin:16px 0 0;padding:0">
+      {% include "teacher/partials/_nav_item.html" with href=u_overview|default:"/dashboard/teacher/" label="Overview" icon="home" exact="1" %}
+    </ul>
+    <div class="sp-group"><div class="sp-group-label">Content</div><ul>
+      {% include "teacher/partials/_nav_item.html" with href=u_courses label="Courses" icon="book" %}
+      {% include "teacher/partials/_nav_item.html" with href=u_materials label="Materials" icon="file" %}
+    </ul></div>
+    <div class="sp-group"><div class="sp-group-label">Learning</div><ul>
+      {% include "teacher/partials/_nav_item.html" with href=u_enrollments label="Enrollments" icon="user-plus" %}
+      {% include "teacher/partials/_nav_item.html" with href=u_submissions label="Submissions" icon="clipboard" %}
+      {% include "teacher/partials/_nav_item.html" with href=u_permissions label="Permissions" icon="key" %}
+    </ul></div>
+    <div class="sp-group"><div class="sp-group-label">People</div><ul>
+      {% include "teacher/partials/_nav_item.html" with href=u_students label="Students" icon="users" %}
+    </ul></div>
+    <div class="sp-group"><div class="sp-group-label">System</div><ul>
+      {% include "teacher/partials/_nav_item.html" with href=u_settings label="Site Settings" icon="sliders" %}
+      {% include "teacher/partials/_nav_item.html" with href=u_faqs label="FAQs" icon="help" %}
+      {% include "teacher/partials/_nav_item.html" with href=u_admin label="Django Admin" icon="shield" external="1" %}
+      {% include "teacher/partials/_nav_item.html" with href=u_home|default:"/" label="Exit to Main Site" icon="back" %}
+    </ul></div>
+  </nav>
+  <div class="sp-me">
+    <span class="sp-av sp-av--dark" aria-hidden="true">{{ request.user.get_username|slice:":2"|upper }}</span>
+    <div class="sp-me-txt"><b>{{ request.user.get_full_name|default:request.user.get_username }}</b><span>Teacher</span></div>
+    <button type="button" class="sp-iconbtn" data-sp-theme-toggle aria-label="Toggle dark mode"><svg class="sp-i" aria-hidden="true"><use href="#i-moon"/></svg></button>
+    <form method="post" action="{{ u_logout|default:'/accounts/logout/' }}">{% csrf_token %}
+      <button type="submit" class="sp-iconbtn" aria-label="Sign out"><svg class="sp-i" aria-hidden="true"><use href="#i-logout"/></svg></button>
+    </form>
+  </div>
+</aside>

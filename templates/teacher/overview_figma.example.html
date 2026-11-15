@@ -1,0 +1,55 @@
+{% extends "teacher/base_figma.html" %}
+{% block title %}Overview{% endblock %}
+{% block page_title %}Welcome back, {{ request.user.get_full_name|default:request.user.get_username }}{% endblock %}
+{% block page_subtitle %}Here is what is happening on your platform today.{% endblock %}
+{% block header_actions %}<a class="sp-btn" href="#">New Course</a>{% endblock %}  {# TODO: your "new course" url #}
+
+{% block content %}
+<div class="sp-stack">
+
+  {# MAP: replace every {{ ... }} below with the variable YOUR current overview view already passes. #}
+  <section class="sp-stats" aria-label="Platform statistics">
+    {% include "teacher/partials/_stat_card.html" with label="Active students" value=active_students hint="Enrolled in at least one course" %}
+    {% include "teacher/partials/_stat_card.html" with label="Published courses" value=published_courses hint="Active public offerings" href="#" link_label="Manage courses" %}
+    {% include "teacher/partials/_stat_card.html" with label="File permissions" value=pending_permissions hint="Pending file download requests" href="#" link_label="Review queue" %}
+    {% include "teacher/partials/_stat_card.html" with label="Pending submissions" value=pending_submissions hint="Ungraded submissions awaiting review" tone="warn" %}
+    {% include "teacher/partials/_stat_card.html" with label="Pending approvals" value=pending_approvals hint="Pending enrollment requests" %}
+    {% include "teacher/partials/_stat_card.html" with label="Upcoming deadlines" value=upcoming_deadlines hint="Assignments due in the next 7 days" %}
+  </section>
+
+  <section class="sp-card sp-pad">
+    <h2 class="sp-section-title">Quick actions</h2>
+    <div class="sp-actions">
+      <a class="sp-btn" href="#">Upload study material</a>
+      <a class="sp-btn sp-btn--secondary" href="#">Create course</a>
+      <a class="sp-btn sp-btn--secondary" href="#">Create assignment</a>
+    </div>
+  </section>
+
+  <div class="sp-grid">
+    <section class="sp-card sp-pad">
+      <h2 class="sp-section-title">Latest submissions</h2>
+      <ul class="sp-list">
+        {% for s in latest_submissions %}
+        <li class="sp-li">
+          <span class="sp-av" aria-hidden="true">{{ s.student.get_username|slice:":2"|upper }}</span>
+          <div class="sp-li-main"><p class="sp-li-title">{{ s.student.get_full_name|default:s.student.get_username }}</p><p class="sp-li-meta">{{ s.assignment }} &middot; {{ s.submitted_at|date:"j M" }}</p></div>
+          <span class="sp-badge sp-badge--warn">Pending</span>
+        </li>
+        {% empty %}<li class="sp-empty"><b>No recent submissions</b>New student work will show up here.</li>{% endfor %}
+      </ul>
+      <a class="sp-btn sp-btn--ghost sp-btn--sm" href="#">View all</a>
+    </section>
+
+    <section class="sp-card sp-pad">
+      <h2 class="sp-section-title">Latest file permission requests</h2>
+      <ul class="sp-list">
+        {% for p in latest_permissions %}
+        <li class="sp-li"><div class="sp-li-main"><p class="sp-li-title">{{ p.material }}</p><p class="sp-li-meta">{{ p.student }} &middot; {{ p.created_at|date:"j M" }}</p></div><span class="sp-badge sp-badge--warn">Pending</span></li>
+        {% empty %}<li class="sp-empty"><b>No recent requests</b>Download requests will show up here.</li>{% endfor %}
+      </ul>
+      <a class="sp-btn sp-btn--ghost sp-btn--sm" href="#">View all</a>
+    </section>
+  </div>
+</div>
+{% endblock %}
