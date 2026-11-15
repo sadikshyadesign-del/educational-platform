@@ -11,6 +11,7 @@
 .sp :focus-visible{outline:2px solid var(--sp-selx);outline-offset:2px}
 .sp-skip{position:absolute;left:-999px;top:8px;background:var(--sp-ink);color:var(--sp-ink-on);padding:8px 12px;border-radius:6px;z-index:100}
 .sp-skip:focus{left:8px}
+.sp .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .sp-i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 
 /* shell + sidebar (roomy: 272px wide, 44px rows) */
@@ -118,6 +119,14 @@
 .sp-course-name>a{font-weight:600}
 .sp-course-row-actions{min-width:280px}
 .sp-course-row-actions .sp-btn{white-space:nowrap}
+.sp-course-list-summary{display:flex;justify-content:flex-end}
+.sp-lesson-name{min-width:220px}
+.sp-lesson-name .sp-chips{margin:8px 0 0}
+.sp-lesson-name .sp-badge{text-transform:none}
+.sp-lesson-actions{min-width:320px}
+.sp-reorder{display:flex;gap:4px}
+.sp-inline-form{display:inline-flex;margin:0}
+.sp-inline-form button:disabled{opacity:.35;cursor:not-allowed}
 .sp-form-card{max-width:760px}
 .sp-field-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
 .sp-field-heading label{margin:0}
