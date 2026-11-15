@@ -127,6 +127,11 @@
 .sp-reorder{display:flex;gap:4px}
 .sp-inline-form{display:inline-flex;margin:0}
 .sp-inline-form button:disabled{opacity:.35;cursor:not-allowed}
+.sp-assignment-name{min-width:220px}
+.sp-assignment-name .sp-chips{margin:8px 0 0}
+.sp-assignment-actions{min-width:320px}
+.sp-assignment-pending{color:var(--sp-wn);font-weight:600}
+.sp #delete-assignment-modal-desc .text-rose-600{color:var(--sp-er);font-weight:700}
 .sp-form-card{max-width:760px}
 .sp-field-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
 .sp-field-heading label{margin:0}
