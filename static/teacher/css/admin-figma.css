@@ -6,6 +6,7 @@
 
 .sp{margin:0;background:var(--sp-bg);color:var(--sp-tx);font:14px/22px Inter,"Noto Sans Devanagari",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .sp *,.sp *::before,.sp *::after{box-sizing:border-box}
+.sp .hidden{display:none!important}
 .sp a{color:inherit}
 .sp :focus-visible{outline:2px solid var(--sp-selx);outline-offset:2px}
 .sp-skip{position:absolute;left:-999px;top:8px;background:var(--sp-ink);color:var(--sp-ink-on);padding:8px 12px;border-radius:6px;z-index:100}
@@ -102,6 +103,30 @@
 .sp-chip:hover{background:var(--sp-hov)}
 .sp-chip[aria-current="true"]{background:var(--sp-ink);color:var(--sp-ink-on);border-color:var(--sp-ink)}
 .sp-pager{display:flex;gap:8px;justify-content:center;margin-top:16px}
+
+/* Course list */
+.sp-course-toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px}
+.sp-course-toolbar .sp-field{margin:0}
+.sp-course-toolbar .sp-field>span,.sp-course-filter-label{display:block;margin-bottom:6px;font-size:13px;font-weight:600}
+.sp-course-search{flex:1;min-width:220px}
+.sp-course-filter{min-width:150px}
+.sp-course-filter-actions{align-items:flex-end}
+.sp-course-cell{display:flex;align-items:center;gap:12px;min-width:240px}
+.sp-course-thumb{width:64px;height:48px;flex:none;object-fit:cover;border:1px solid var(--sp-bd);border-radius:6px}
+.sp-course-thumb--fallback{display:inline-flex;align-items:center;justify-content:center;background:var(--sp-sel);color:var(--sp-selx);font-weight:600}
+.sp-course-name{display:flex;flex-direction:column;min-width:0}
+.sp-course-name>a{font-weight:600}
+.sp-course-row-actions{min-width:280px}
+.sp-course-row-actions .sp-btn{white-space:nowrap}
+
+/* Legacy course archive interaction, styled with the Figma system */
+.sp-modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--sp-scrim);backdrop-filter:blur(4px)}
+.sp-modal-card{width:min(440px,100%);padding:24px;border:1px solid var(--sp-bd);border-radius:10px;background:var(--sp-card);color:var(--sp-tx);box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.sp-modal-card h2{margin:0 0 8px;font-size:20px;line-height:28px}
+.sp-modal-card p{margin:0 0 20px;color:var(--sp-tx2)}
+.sp-modal-actions{justify-content:flex-end}
+.sp #archive-modal-submit{height:40px;padding:0 16px;border:1px solid transparent;border-radius:6px;background:var(--sp-ink);color:var(--sp-ink-on);font:600 14px/20px Inter,system-ui,sans-serif;cursor:pointer}
+.sp #archive-modal-submit:hover{background:var(--sp-ink-h)}
 
 /* forms (work on ordinary Django widgets: {{ field }}) */
 .sp-field{margin-bottom:16px}

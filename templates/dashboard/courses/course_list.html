@@ -1,271 +1,169 @@
-{% extends "dashboard/teacher_base.html" %}
+{% extends "teacher/base_figma.html" %}
+{% load static %}
 
 {% block title %}Courses — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
+{% block page_title %}Courses{% endblock %}
+{% block page_subtitle %}Manage your catalog, syllabus lessons, and assignment deadlines.{% endblock %}
 
-{% block dashboard_content %}
-<div>
-  <!-- Breadcrumb -->
-  <nav class="mb-6 flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400" aria-label="Breadcrumb">
-    <a href="{% url 'dashboard:teacher' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Teacher Portal
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <span class="font-medium text-slate-900 dark:text-white" aria-current="page">
-      Courses
-    </span>
+{% block header_actions %}
+  <a href="{% url 'dashboard:teacher_course_create' %}" class="sp-btn">
+    <svg class="sp-i" aria-hidden="true"><use href="#i-plus"/></svg>
+    <span>Create Course</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+{% url 'dashboard:teacher_courses' as courses_page_url %}
+<div class="sp-stack">
+  <nav class="sp-chips" aria-label="Breadcrumb">
+    <a class="sp-chip" href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
+    <span class="sp-chip" aria-current="page">Courses</span>
   </nav>
 
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-slate-800">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight font-display">
-        Courses
-      </h1>
-      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-        Manage your catalog, syllabus lessons, and assignment deadlines.
-      </p>
-    </div>
-    <div class="flex items-center gap-3">
-      <a
-        href="{% url 'dashboard:teacher_course_create' %}"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px]"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        <span>Create Course</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Filters & Search Form -->
-  <form method="get" action="{% url 'dashboard:teacher_courses' %}" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 mb-6 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3">
-    <!-- Search Query -->
-    <div class="relative flex-1">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+  <form method="get" action="{% url 'dashboard:teacher_courses' %}" class="sp-card sp-pad sp-stack">
+    <div class="sp-course-toolbar">
+      <label class="sp-field sp-course-search">
+        <span>Search courses</span>
+        <input
+          type="search"
+          name="q"
+          value="{{ search_query }}"
+          placeholder="Search courses by title or description..."
+        />
+      </label>
+      <label class="sp-field sp-course-filter">
+        <span>Status</span>
+        <select name="status" data-auto-submit>
+          <option value="" {% if not status_filter %}selected{% endif %}>All Statuses</option>
+          <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+          <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Drafts</option>
+          <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+        </select>
+      </label>
+      <label class="sp-field sp-course-filter">
+        <span>Pricing</span>
+        <select name="pricing" data-auto-submit>
+          <option value="" {% if not pricing_filter %}selected{% endif %}>All Types</option>
+          <option value="free" {% if pricing_filter == 'free' %}selected{% endif %}>Free</option>
+          <option value="paid" {% if pricing_filter == 'paid' %}selected{% endif %}>Paid</option>
+        </select>
+      </label>
+      <div class="sp-actions sp-course-filter-actions">
+        <button type="submit" class="sp-btn sp-btn--secondary">Filter</button>
+        {% if search_query or status_filter or pricing_filter %}
+          <a href="{% url 'dashboard:teacher_courses' %}" class="sp-btn sp-btn--ghost">Reset</a>
+        {% endif %}
       </div>
-      <input
-        type="search"
-        name="q"
-        value="{{ search_query }}"
-        placeholder="Search courses by title or description..."
-        class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
     </div>
 
-    <!-- Status Filter -->
-    <div class="w-full md:w-44">
-      <select
-        name="status"
-        data-auto-submit
-        class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        <option value="" {% if not status_filter %}selected{% endif %}>All Statuses</option>
-        <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
-        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Drafts</option>
-        <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
-      </select>
-    </div>
-
-    <!-- Pricing Filter -->
-    <div class="w-full md:w-36">
-      <select
-        name="pricing"
-        data-auto-submit
-        class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        <option value="" {% if not pricing_filter %}selected{% endif %}>All Types</option>
-        <option value="free" {% if pricing_filter == 'free' %}selected{% endif %}>Free</option>
-        <option value="paid" {% if pricing_filter == 'paid' %}selected{% endif %}>Paid</option>
-      </select>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <button
-        type="submit"
-        class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-      >
-        Filter
-      </button>
-      {% if search_query or status_filter or pricing_filter %}
-        <a
-          href="{% url 'dashboard:teacher_courses' %}"
-          class="px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-        >
-          Reset
-        </a>
-      {% endif %}
+    <div>
+      <span class="sp-course-filter-label">Status</span>
+      <nav class="sp-chips" aria-label="Filter by course status">
+        <a class="sp-chip" aria-current="{% if not status_filter or status_filter == 'all' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if pricing_filter and pricing_filter != 'all' %}pricing={{ pricing_filter|urlencode }}{% endif %}">All</a>
+        <a class="sp-chip" aria-current="{% if status_filter == 'published' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}status=published{% if pricing_filter and pricing_filter != 'all' %}&amp;pricing={{ pricing_filter|urlencode }}{% endif %}">Published</a>
+        <a class="sp-chip" aria-current="{% if status_filter == 'draft' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}status=draft{% if pricing_filter and pricing_filter != 'all' %}&amp;pricing={{ pricing_filter|urlencode }}{% endif %}">Drafts</a>
+        <a class="sp-chip" aria-current="{% if status_filter == 'archived' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}status=archived{% if pricing_filter and pricing_filter != 'all' %}&amp;pricing={{ pricing_filter|urlencode }}{% endif %}">Archived</a>
+      </nav>
+      <span class="sp-course-filter-label">Pricing</span>
+      <nav class="sp-chips" aria-label="Filter by course pricing">
+        <a class="sp-chip" aria-current="{% if not pricing_filter or pricing_filter == 'all' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if status_filter and status_filter != 'all' %}status={{ status_filter|urlencode }}{% endif %}">All types</a>
+        <a class="sp-chip" aria-current="{% if pricing_filter == 'free' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if status_filter and status_filter != 'all' %}status={{ status_filter|urlencode }}&amp;{% endif %}pricing=free">Free</a>
+        <a class="sp-chip" aria-current="{% if pricing_filter == 'paid' %}true{% else %}false{% endif %}" href="{{ courses_page_url }}?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if status_filter and status_filter != 'all' %}status={{ status_filter|urlencode }}&amp;{% endif %}pricing=paid">Paid</a>
+      </nav>
     </div>
   </form>
 
-  <!-- Courses List -->
   {% if courses %}
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden mb-6">
-      <div class="divide-y divide-slate-100 dark:divide-slate-800">
-        {% for course in courses %}
-          <div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
-            <!-- Left Info -->
-            <div class="flex items-start gap-4 min-w-0">
-              <!-- Thumbnail or Fallback -->
-              <div class="w-16 h-12 sm:w-20 sm:h-14 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 flex items-center justify-center">
-                {% if course.thumbnail_webp %}
-                  <img src="{{ course.thumbnail_webp.url }}" alt="{{ course.title }}" class="w-full h-full object-cover" />
-                {% elif course.thumbnail %}
-                  <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-full object-cover" />
-                {% else %}
-                  <div class="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base">
-                    {{ course.title|slice:":1"|upper }}
+    <section class="sp-card sp-table-wrap" aria-label="Courses">
+      <table class="sp-table">
+        <thead>
+          <tr>
+            <th scope="col">Course</th>
+            <th scope="col">Status</th>
+            <th scope="col">Pricing</th>
+            <th scope="col">Activity</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in courses %}
+            <tr>
+              <th scope="row">
+                <div class="sp-course-cell">
+                  {% if course.thumbnail_webp %}
+                    <img src="{{ course.thumbnail_webp.url }}" alt="{{ course.title }}" class="sp-course-thumb" />
+                  {% elif course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="sp-course-thumb" />
+                  {% else %}
+                    <span class="sp-course-thumb sp-course-thumb--fallback" aria-hidden="true">{{ course.title|slice:":1"|upper }}</span>
+                  {% endif %}
+                  <div class="sp-course-name">
+                    <a href="{% url 'dashboard:teacher_course_edit' course.slug %}">{{ course.title }}</a>
+                    <span class="sp-li-meta">/{{ course.slug }}</span>
                   </div>
+                </div>
+              </th>
+              <td>
+                {% if course.is_archived %}
+                  <span class="sp-badge">Archived</span>
+                {% elif course.is_published %}
+                  <span class="sp-badge sp-badge--ok">Published</span>
+                {% else %}
+                  <span class="sp-badge sp-badge--warn">Draft</span>
                 {% endif %}
-              </div>
-
-              <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-center gap-2 mb-1">
-                  <h2 class="text-base font-bold text-slate-900 dark:text-white truncate">
-                    {{ course.title }}
-                  </h2>
-                  <!-- Badges -->
-                  {% if course.is_archived %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                      Archived
-                    </span>
-                  {% elif course.is_published %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                      Published
-                    </span>
-                  {% else %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                      Draft
-                    </span>
-                  {% endif %}
-
-                  {% if course.is_free %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
-                      Free
-                    </span>
-                  {% else %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">
-                      रू {{ course.price }}
-                    </span>
-                  {% endif %}
+              </td>
+              <td>
+                {% if course.is_free %}
+                  <span class="sp-badge">Free</span>
+                {% else %}
+                  <span class="sp-badge">रू {{ course.price }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <div>{{ course.lesson_count }} lesson{{ course.lesson_count|pluralize }}</div>
+                <div class="sp-li-meta">{{ course.assignment_count }} assignment{{ course.assignment_count|pluralize }} · {{ course.active_student_count }} active student{{ course.active_student_count|pluralize }}</div>
+              </td>
+              <td>
+                <div class="sp-actions sp-course-row-actions">
+                  <a href="{% url 'dashboard:teacher_lessons' course.slug %}" class="sp-btn sp-btn--secondary sp-btn--sm">Lessons ({{ course.lesson_count }})</a>
+                  <a href="{% url 'dashboard:teacher_assignments' course.slug %}" class="sp-btn sp-btn--secondary sp-btn--sm">Assignments ({{ course.assignment_count }})</a>
+                  <a href="{% url 'dashboard:teacher_course_materials' course.slug %}" class="sp-btn sp-btn--secondary sp-btn--sm">Materials</a>
+                  <a href="{% url 'dashboard:teacher_course_edit' course.slug %}" class="sp-btn sp-btn--secondary sp-btn--sm">Edit</a>
+                  <a href="{% url 'dashboard:teacher_course_grades_export' slug=course.slug %}" class="sp-btn sp-btn--ghost sp-btn--sm" title="Download Grades CSV">Grades CSV</a>
+                  <a href="{% url 'dashboard:teacher_course_progress_export' slug=course.slug %}" class="sp-btn sp-btn--ghost sp-btn--sm" title="Download Syllabus Progress CSV">Progress CSV</a>
+                  <button
+                    type="button"
+                    data-course-slug="{{ course.slug }}"
+                    data-course-title="{{ course.title }}"
+                    data-course-archived="{% if course.is_archived %}true{% else %}false{% endif %}"
+                    data-active-students="{{ course.active_student_count }}"
+                    class="archive-toggle-btn sp-btn sp-btn--secondary sp-btn--sm"
+                  >
+                    {% if course.is_archived %}Restore{% else %}Archive{% endif %}
+                  </button>
                 </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
 
-                <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-500 dark:text-slate-400">
-                  <span class="font-mono text-slate-400 dark:text-slate-500">/{{ course.slug }}</span>
-                  <span>&bull;</span>
-                  <span>{{ course.lesson_count }} lesson{{ course.lesson_count|pluralize }}</span>
-                  <span>&bull;</span>
-                  <span>{{ course.assignment_count }} assignment{{ course.assignment_count|pluralize }}</span>
-                  <span>&bull;</span>
-                  <span>{{ course.active_student_count }} active student{{ course.active_student_count|pluralize }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Actions -->
-            <div class="flex items-center flex-wrap gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
-              <a
-                href="{% url 'dashboard:teacher_lessons' course.slug %}"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-              >
-                Lessons ({{ course.lesson_count }})
-              </a>
-              <a
-                href="{% url 'dashboard:teacher_assignments' course.slug %}"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-              >
-                Assignments ({{ course.assignment_count }})
-              </a>
-              <a
-                href="{% url 'dashboard:teacher_course_materials' course.slug %}"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-              >
-                Materials
-              </a>
-              <a
-                href="{% url 'dashboard:teacher_course_edit' course.slug %}"
-                class="px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/40 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition"
-              >
-                Edit
-              </a>
-              <a
-                href="{% url 'dashboard:teacher_course_grades_export' slug=course.slug %}"
-                class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                title="Download Grades CSV"
-              >
-                Grades CSV
-              </a>
-              <a
-                href="{% url 'dashboard:teacher_course_progress_export' slug=course.slug %}"
-                class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                title="Download Syllabus Progress CSV"
-              >
-                Progress CSV
-              </a>
-
-              <!-- Archive / Unarchive Toggle Button -->
-              <button
-                type="button"
-                data-course-slug="{{ course.slug }}"
-                data-course-title="{{ course.title }}"
-                data-course-archived="{% if course.is_archived %}true{% else %}false{% endif %}"
-                data-active-students="{{ course.active_student_count }}"
-                class="archive-toggle-btn px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                {% if course.is_archived %}Restore{% else %}Archive{% endif %}
-              </button>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Pagination -->
     {% if page_obj.has_other_pages %}
-      <nav class="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 px-4 py-3 sm:px-6 bg-white dark:bg-slate-900 rounded-2xl shadow-xs" aria-label="Pagination">
-        <div class="hidden sm:block">
-          <p class="text-xs text-slate-700 dark:text-slate-300">
-            Showing page <span class="font-bold">{{ page_obj.number }}</span> of <span class="font-bold">{{ page_obj.paginator.num_pages }}</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-2">
-          {% if page_obj.has_previous %}
-            <a
-              href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if pricing_filter %}&pricing={{ pricing_filter }}{% endif %}"
-              class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-            >
-              Previous
-            </a>
-          {% endif %}
-          {% if page_obj.has_next %}
-            <a
-              href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if pricing_filter %}&pricing={{ pricing_filter }}{% endif %}"
-              class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-            >
-              Next
-            </a>
-          {% endif %}
-        </div>
+      <nav class="sp-pager" aria-label="Pagination">
+        <span class="sp-li-meta">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if pricing_filter %}&pricing={{ pricing_filter }}{% endif %}" class="sp-btn sp-btn--secondary sp-btn--sm">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if pricing_filter %}&pricing={{ pricing_filter }}{% endif %}" class="sp-btn sp-btn--secondary sp-btn--sm">Next</a>
+        {% endif %}
       </nav>
     {% endif %}
-
   {% else %}
-    <!-- Empty State -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-xs">
-      <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center mb-4">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      </div>
-      <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">
-        No courses found
-      </h3>
-      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+    <section class="sp-card sp-empty">
+      <h2 class="sp-section-title">No courses found</h2>
+      <p>
         {% if search_query or status_filter or pricing_filter %}
           No courses match your current search or filters. Try resetting the filters.
         {% else %}
@@ -273,60 +171,37 @@
         {% endif %}
       </p>
       {% if search_query or status_filter or pricing_filter %}
-        <a
-          href="{% url 'dashboard:teacher_courses' %}"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-        >
-          Clear Filters
-        </a>
+        <a href="{% url 'dashboard:teacher_courses' %}" class="sp-btn sp-btn--secondary">Clear Filters</a>
       {% else %}
-        <a
-          href="{% url 'dashboard:teacher_course_create' %}"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition"
-        >
-          Create First Course
-        </a>
+        <a href="{% url 'dashboard:teacher_course_create' %}" class="sp-btn">Create First Course</a>
       {% endif %}
-    </div>
+    </section>
   {% endif %}
 </div>
 
-<!-- Archive / Restore Confirmation Modal -->
 <div
   id="archive-modal"
-  class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+  class="sp-modal-overlay hidden"
   role="dialog"
   aria-modal="true"
   aria-labelledby="archive-modal-title"
 >
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full p-6 transform transition-all">
-    <h3 id="archive-modal-title" class="text-lg font-bold text-slate-900 dark:text-white mb-2">
-      Archive Course
-    </h3>
-    <p id="archive-modal-desc" class="text-xs text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+  <div class="sp-modal-card">
+    <h2 id="archive-modal-title">Archive Course</h2>
+    <p id="archive-modal-desc">
       Archiving hides the course from the public catalog, but currently enrolled students will retain access to lessons and submitted work.
     </p>
-
     <form id="archive-form" method="post" action="">
       {% csrf_token %}
-      <div class="flex items-center justify-end gap-3">
-        <button
-          type="button"
-          id="archive-modal-cancel"
-          class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          id="archive-modal-submit"
-          class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-xs transition"
-        >
-          Confirm Archive
-        </button>
+      <div class="sp-actions sp-modal-actions">
+        <button type="button" id="archive-modal-cancel" class="sp-btn sp-btn--secondary">Cancel</button>
+        <button type="submit" id="archive-modal-submit" class="sp-btn">Confirm Archive</button>
       </div>
     </form>
   </div>
 </div>
+{% endblock %}
 
-{% endblock dashboard_content %}
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}" defer></script>
+{% endblock %}
