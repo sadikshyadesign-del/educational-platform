@@ -135,7 +135,16 @@
 .sp-check-field{display:flex;align-items:flex-start;gap:12px}
 .sp-check-field input[type=checkbox]{width:18px;height:18px;margin:2px 0 0;accent-color:var(--sp-selx)}
 .sp-check-field label{font-weight:600;cursor:pointer}
+.sp-check-field--separated{margin-top:16px;padding-top:16px;border-top:1px solid var(--sp-bd)}
 .sp-form-actions{justify-content:space-between;border-top:1px solid var(--sp-bd);padding-top:16px}
+.sp-progress-notice{max-width:760px}
+.sp-video-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.sp-video-fields .sp-field{margin:0}
+.sp-video-preview{margin-top:16px;padding-top:16px;border-top:1px solid var(--sp-bd)}
+.sp-video-preview>p{margin:0 0 8px;font-size:12px;font-weight:600;color:var(--sp-tx2)}
+.sp-video-preview>div{width:min(100%,520px);aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:#000}
+.sp-video-preview iframe{width:100%;height:100%;border:0}
+.sp-duration-grid{display:grid;grid-template-columns:repeat(2,minmax(0,160px));gap:16px}
 .sp-current-thumbnail{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:12px;border:1px solid var(--sp-bd);border-radius:8px;background:var(--sp-bg)}
 .sp-current-thumbnail img{width:80px;height:56px;object-fit:cover;border-radius:6px}
 .sp-current-thumbnail p{margin:4px 0 0;color:var(--sp-tx2);font-size:13px}

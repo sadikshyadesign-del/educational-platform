@@ -1,125 +1,63 @@
-{% extends "dashboard/teacher_base.html" %}
+{% extends "teacher/base_figma.html" %}
+{% load static %}
 
 {% block title %}{% if is_create %}Add Lesson{% else %}Edit Lesson: {{ lesson.title }}{% endif %} — {{ course.title }} — {{ site_settings.site_name }}{% endblock title %}
+{% block page_title %}{% if is_create %}Add Lesson to {{ course.title }}{% else %}Edit Lesson: {{ lesson.title }}{% endif %}{% endblock %}
+{% block page_subtitle %}Configure video hosting provider, URL, duration, and preview settings.{% endblock %}
 
-{% block dashboard_content %}
-<div>
-  <!-- Breadcrumb -->
-  <nav class="mb-6 flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400" aria-label="Breadcrumb">
-    <a href="{% url 'dashboard:teacher' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Teacher Portal
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <a href="{% url 'dashboard:teacher_courses' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Courses
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <a href="{% url 'dashboard:teacher_lessons' course.slug %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate max-w-xs">
-      {{ course.title }} Lessons
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <span class="font-medium text-slate-900 dark:text-white" aria-current="page">
-      {% if is_create %}New Lesson{% else %}Edit Lesson{% endif %}
-    </span>
+{% block content %}
+<div class="sp-stack">
+  <nav class="sp-chips" aria-label="Breadcrumb">
+    <a class="sp-chip" href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
+    <a class="sp-chip" href="{% url 'dashboard:teacher_courses' %}">Courses</a>
+    <a class="sp-chip" href="{% url 'dashboard:teacher_lessons' course.slug %}">{{ course.title }} Lessons</a>
+    <span class="sp-chip" aria-current="page">{% if is_create %}New Lesson{% else %}Edit Lesson{% endif %}</span>
   </nav>
 
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight font-display">
-        {% if is_create %}Add Lesson to {{ course.title }}{% else %}Edit Lesson: {{ lesson.title }}{% endif %}
-      </h1>
-      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-        Configure video hosting provider, URL, duration, and preview settings.
-      </p>
-    </div>
-  </div>
-
-  <!-- Progress Reset Notice for Existing Lessons (Requirement 7) -->
   {% if not is_create and student_progress_count > 0 %}
-    <div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 flex items-start gap-3 max-w-3xl">
-      <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      <div class="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-        <strong>Notice on Video Updates:</strong> This lesson has watch activity from <strong class="font-bold">{{ student_progress_count }}</strong> student{{ student_progress_count|pluralize }}.
-        If you change the video URL or provider, their current timestamp position will be reset back to 00:00 (their completion mark will remain preserved).
-      </div>
+    <div class="sp-alert sp-alert--warn sp-progress-notice" role="status">
+      <strong>Notice on Video Updates:</strong>
+      This lesson has watch activity from <strong>{{ student_progress_count }}</strong> student{{ student_progress_count|pluralize }}.
+      If you change the video URL or provider, their current timestamp position will be reset back to 00:00 (their completion mark will remain preserved).
     </div>
   {% endif %}
 
-  <!-- Form Card -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs max-w-3xl">
-    <form method="post" action="" novalidate class="space-y-6">
+  <section class="sp-card sp-pad sp-form-card">
+    <form method="post" action="" novalidate class="sp-stack">
       {% csrf_token %}
-
       {% if form.non_field_errors %}
-        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-xs font-semibold text-rose-800 dark:text-rose-300">
-          {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
+        <div class="sp-error-summary" role="alert">
+          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
         </div>
       {% endif %}
 
-      <!-- Lesson Title -->
-      <div>
-        <label for="{{ form.title.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-          Lesson Title <span class="text-rose-500">*</span>
-        </label>
+      <div class="sp-field">
+        <label for="{{ form.title.id_for_label }}">Lesson Title <span aria-hidden="true">*</span></label>
         {{ form.title }}
-        {% if form.title.errors %}
-          <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.title.errors.0 }}</p>
-        {% endif %}
+        {% if form.title.errors %}<p class="sp-error" role="alert">{{ form.title.errors.0 }}</p>{% endif %}
       </div>
 
-      <!-- Video Provider & URL Input -->
-      <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-          Video Configuration
-        </h3>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <!-- Provider -->
-          <div>
-            <label for="{{ form.video_provider.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-              Provider <span class="text-rose-500">*</span>
-            </label>
+      <section class="sp-card sp-form-section">
+        <h2 class="sp-section-title">Video Configuration</h2>
+        <div class="sp-video-fields">
+          <div class="sp-field">
+            <label for="{{ form.video_provider.id_for_label }}">Provider <span aria-hidden="true">*</span></label>
             {{ form.video_provider }}
-            {% if form.video_provider.errors %}
-              <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.video_provider.errors.0 }}</p>
-            {% endif %}
+            {% if form.video_provider.errors %}<p class="sp-error" role="alert">{{ form.video_provider.errors.0 }}</p>{% endif %}
           </div>
-
-          <!-- Video Input (URL or ID) -->
-          <div class="sm:col-span-2">
-            <label for="{{ form.video_input.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-              Video URL or ID <span class="text-rose-500">*</span>
-            </label>
+          <div class="sp-field">
+            <label for="{{ form.video_input.id_for_label }}">Video URL or ID <span aria-hidden="true">*</span></label>
             {{ form.video_input }}
-            {% if form.video_input.help_text %}
-              <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{{ form.video_input.help_text }}</p>
-            {% endif %}
-            {% if form.video_input.errors %}
-              <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.video_input.errors.0 }}</p>
-            {% endif %}
+            {% if form.video_input.help_text %}<p class="sp-help">{{ form.video_input.help_text }}</p>{% endif %}
+            {% if form.video_input.errors %}<p class="sp-error" role="alert">{{ form.video_input.errors.0 }}</p>{% endif %}
           </div>
         </div>
 
-        <!-- Live Video Embed Preview Container -->
-        <div id="video-preview-box" class="hidden mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-700/60">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-            Embed Preview
-          </p>
-          <div class="aspect-video w-full max-w-md rounded-xl overflow-hidden bg-black shadow-inner">
+        <div id="video-preview-box" class="hidden sp-video-preview">
+          <p>Embed Preview</p>
+          <div>
             <iframe
               id="video-preview-iframe"
-              class="w-full h-full"
               src=""
               title="Video Preview"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -129,102 +67,63 @@
             ></iframe>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Duration (Minutes + Seconds) (Requirement 12) -->
-      <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-          Lesson Duration
-        </h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">
-          Enter the playback duration in minutes and seconds.
-        </p>
-        <div class="grid grid-cols-2 gap-4 max-w-xs">
-          <div>
-            <label for="{{ form.duration_minutes.id_for_label }}" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-              Minutes
-            </label>
+      <section class="sp-card sp-form-section">
+        <h2 class="sp-section-title">Lesson Duration</h2>
+        <p class="sp-help">Enter the playback duration in minutes and seconds.</p>
+        <div class="sp-duration-grid">
+          <div class="sp-field">
+            <label for="{{ form.duration_minutes.id_for_label }}">Minutes</label>
             {{ form.duration_minutes }}
-            {% if form.duration_minutes.errors %}
-              <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.duration_minutes.errors.0 }}</p>
-            {% endif %}
+            {% if form.duration_minutes.errors %}<p class="sp-error" role="alert">{{ form.duration_minutes.errors.0 }}</p>{% endif %}
           </div>
-          <div>
-            <label for="{{ form.duration_seconds.id_for_label }}" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-              Seconds (0-59)
-            </label>
+          <div class="sp-field">
+            <label for="{{ form.duration_seconds.id_for_label }}">Seconds (0-59)</label>
             {{ form.duration_seconds }}
-            {% if form.duration_seconds.errors %}
-              <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.duration_seconds.errors.0 }}</p>
-            {% endif %}
+            {% if form.duration_seconds.errors %}<p class="sp-error" role="alert">{{ form.duration_seconds.errors.0 }}</p>{% endif %}
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Lesson Notes -->
-      <div>
-        <label for="{{ form.description.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-          Lesson Notes & Key Takeaways
-        </label>
+      <div class="sp-field">
+        <label for="{{ form.description.id_for_label }}">Lesson Notes &amp; Key Takeaways</label>
         {{ form.description }}
-        {% if form.description.help_text %}
-          <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{{ form.description.help_text }}</p>
-        {% endif %}
-        {% if form.description.errors %}
-          <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.description.errors.0 }}</p>
-        {% endif %}
+        {% if form.description.help_text %}<p class="sp-help">{{ form.description.help_text }}</p>{% endif %}
+        {% if form.description.errors %}<p class="sp-error" role="alert">{{ form.description.errors.0 }}</p>{% endif %}
       </div>
 
-      <!-- Visibility Options (Requirement 15) -->
-      <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-          Access & Publishing
-        </h3>
-
-        <!-- Is Preview (Requirement 15) -->
-        <div class="flex items-start gap-3">
+      <section class="sp-card sp-form-section">
+        <h2 class="sp-section-title">Access &amp; Publishing</h2>
+        <div class="sp-check-field">
           {{ form.is_preview }}
           <div>
-            <label for="{{ form.is_preview.id_for_label }}" class="text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-              Allow Free Preview
-            </label>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              {{ form.is_preview.help_text|default:"Preview lessons can be watched by any logged-in user." }}
-            </p>
+            <label for="{{ form.is_preview.id_for_label }}">Allow Free Preview</label>
+            <p class="sp-help">{{ form.is_preview.help_text|default:"Preview lessons can be watched by any logged-in user." }}</p>
+            {% if form.is_preview.errors %}<p class="sp-error" role="alert">{{ form.is_preview.errors.0 }}</p>{% endif %}
           </div>
         </div>
-
-        <!-- Is Published -->
-        <div class="flex items-start gap-3 pt-3 border-t border-slate-200/60 dark:border-slate-700/60">
+        <div class="sp-check-field sp-check-field--separated">
           {{ form.is_published }}
           <div>
-            <label for="{{ form.is_published.id_for_label }}" class="text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-              Publish Lesson
-            </label>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              When checked, students can see and watch this lesson in the syllabus.
-            </p>
+            <label for="{{ form.is_published.id_for_label }}">Publish Lesson</label>
+            <p class="sp-help">When checked, students can see and watch this lesson in the syllabus.</p>
+            {% if form.is_published.errors %}<p class="sp-error" role="alert">{{ form.is_published.errors.0 }}</p>{% endif %}
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Form Actions -->
-      <div class="pt-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
-        <a
-          href="{% url 'dashboard:teacher_course_lessons' slug=course.slug %}"
-          class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-        >
-          Cancel
-        </a>
-        <button
-          type="submit"
-          class="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px]"
-        >
+      <div class="sp-actions sp-form-actions">
+        <a href="{% url 'dashboard:teacher_course_lessons' slug=course.slug %}" class="sp-btn sp-btn--secondary">Cancel</a>
+        <button type="submit" class="sp-btn">
           {% if is_create %}Create Lesson{% else %}Save Changes{% endif %}
         </button>
       </div>
     </form>
-  </div>
+  </section>
 </div>
+{% endblock %}
 
-{% endblock dashboard_content %}
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}" defer></script>
+{% endblock %}
