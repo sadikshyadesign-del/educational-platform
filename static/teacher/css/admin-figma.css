@@ -118,6 +118,22 @@
 .sp-course-name>a{font-weight:600}
 .sp-course-row-actions{min-width:280px}
 .sp-course-row-actions .sp-btn{white-space:nowrap}
+.sp-form-card{max-width:760px}
+.sp-field-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.sp-field-heading label{margin:0}
+.sp-form-section{padding:16px;background:var(--sp-hov)}
+.sp-form-section .sp-section-title{font-size:16px;line-height:24px;margin-bottom:12px}
+.sp-check-field{display:flex;align-items:flex-start;gap:12px}
+.sp-check-field input[type=checkbox]{width:18px;height:18px;margin:2px 0 0;accent-color:var(--sp-selx)}
+.sp-check-field label{font-weight:600;cursor:pointer}
+.sp-form-actions{justify-content:space-between;border-top:1px solid var(--sp-bd);padding-top:16px}
+.sp-current-thumbnail{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:12px;border:1px solid var(--sp-bd);border-radius:8px;background:var(--sp-bg)}
+.sp-current-thumbnail img{width:80px;height:56px;object-fit:cover;border-radius:6px}
+.sp-current-thumbnail p{margin:4px 0 0;color:var(--sp-tx2);font-size:13px}
+.sp-error-summary{padding:12px 16px;border:1px solid var(--sp-er);border-radius:8px;background:var(--sp-erbg);color:var(--sp-er)}
+.sp-error-summary p{margin:0}
+.sp-alert{margin:16px 0;padding:12px;border:1px solid var(--sp-bd);border-radius:8px}
+.sp-alert--warn{border-color:var(--sp-wn);background:var(--sp-wnbg);color:var(--sp-wn)}
 
 /* Legacy course archive interaction, styled with the Figma system */
 .sp-modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--sp-scrim);backdrop-filter:blur(4px)}
