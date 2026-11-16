@@ -1,5 +1,5 @@
 {# include with: label, value, hint (optional), href + link_label (optional), tone="warn" (optional) #}
-<div class="sp-card sp-stat{% if tone == 'warn' %} sp-stat--warn{% endif %}">
+<div class="sp-card sp-stat{% if tone == 'warn' %} sp-stat--warn{% elif tone == 'ok' %} sp-stat--ok{% elif tone == 'muted' %} sp-stat--muted{% endif %}">
   <p class="sp-stat-value">{{ value|default:0 }}</p>
   <p class="sp-stat-label">{{ label }}</p>
   {% if hint %}<p class="sp-stat-hint">{{ hint }}</p>{% endif %}

@@ -1,322 +1,219 @@
-{% extends "dashboard/teacher_base.html" %}
-{% load i18n %}
+{% extends "teacher/base_figma.html" %}
+{% load i18n static %}
 
-{% block teacher_title %}{% trans "Enrollment Management" %}{% endblock %}
+{% block title %}{% trans "Enrollment Management" %} — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
 
-{% block dashboard_content %}
-<div class="space-y-6">
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-    <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-        {% trans "Enrollment Management" %}
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-        {% trans "Approve student requests, manage course access, and enroll students directly." %}
-      </p>
-    </div>
-    <div class="flex items-center gap-3">
-      <button
-        type="button"
-        data-modal-open="manual-enroll-modal"
-        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-xs hover:shadow-sm transition"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-        </svg>
-        <span>{% trans "Manual Enrollment" %}</span>
-      </button>
-    </div>
-  </div>
+{% block breadcrumb %}
+<nav class="sp-crumbs" aria-label="Breadcrumb">
+  <a href="{% url 'dashboard:teacher' %}">{% trans "Teacher Portal" %}</a>
+  <span aria-hidden="true">&rsaquo;</span>
+  <span aria-current="page">{% trans "Enrollment Management" %}</span>
+</nav>
+{% endblock %}
 
-  <!-- Metric Summary Cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+{% block page_title %}{% trans "Enrollment Management" %}{% endblock %}
+{% block page_subtitle %}{% trans "Approve student requests, manage course access, and enroll students directly." %}{% endblock %}
+
+{% block header_actions %}
+<button type="button" data-modal-open="manual-enroll-modal" class="sp-btn">
+  <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-user-plus"/></svg>
+  <span>{% trans "Manual Enrollment" %}</span>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="sp-stack">
+  <div class="sp-stats">
     <a
       href="{% url 'dashboard:teacher_enrollments' %}?status=pending{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-      class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-600 transition"
+      class="sp-card sp-stat sp-card--hover"
     >
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Pending" %}</span>
-        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-      </div>
-      <p class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-2">{{ pending_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Awaiting teacher approval" %}</p>
+      <p class="sp-stat-value sp-warn-text">{{ pending_count }}</p>
+      <p class="sp-stat-label">{% trans "Pending" %}</p>
+      <p class="sp-stat-hint">{% trans "Awaiting teacher approval" %}</p>
     </a>
 
     <a
       href="{% url 'dashboard:teacher_enrollments' %}?status=active{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-      class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-600 transition"
+      class="sp-card sp-stat sp-card--hover"
     >
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Active" %}</span>
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-      </div>
-      <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2">{{ active_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Full access granted" %}</p>
+      <p class="sp-stat-value sp-ok-text">{{ active_count }}</p>
+      <p class="sp-stat-label">{% trans "Active" %}</p>
+      <p class="sp-stat-hint">{% trans "Full access granted" %}</p>
     </a>
 
     <a
       href="{% url 'dashboard:teacher_enrollments' %}?status=revoked{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-      class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-rose-400 dark:hover:border-rose-600 transition"
+      class="sp-card sp-stat sp-card--hover"
     >
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Revoked" %}</span>
-        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-      </div>
-      <p class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-2">{{ revoked_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Access withdrawn" %}</p>
+      <p class="sp-stat-value sp-err-text">{{ revoked_count }}</p>
+      <p class="sp-stat-label">{% trans "Revoked" %}</p>
+      <p class="sp-stat-hint">{% trans "Access withdrawn" %}</p>
     </a>
 
     <a
       href="{% url 'dashboard:teacher_enrollments' %}{% if course_slug != 'all' %}?course={{ course_slug }}{% endif %}"
-      class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-indigo-400 dark:hover:border-indigo-600 transition"
+      class="sp-card sp-stat sp-card--hover"
     >
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Total" %}</span>
-        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-      </div>
-      <p class="text-2xl font-black text-slate-900 dark:text-white mt-2">{{ total_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Across all filtered courses" %}</p>
+      <p class="sp-stat-value">{{ total_count }}</p>
+      <p class="sp-stat-label">{% trans "Total" %}</p>
+      <p class="sp-stat-hint">{% trans "Across all filtered courses" %}</p>
     </a>
   </div>
 
-  <!-- Filters & Search Toolbar -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs">
-    <form method="get" class="flex flex-col md:flex-row gap-3">
-      <!-- Search Input -->
-      <div class="relative flex-1">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <input
-          type="text"
-          name="q"
-          value="{{ search_query }}"
-          placeholder="{% trans 'Search by student name or email...' %}"
-          class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-        >
-      </div>
-
-      <!-- Course Selector -->
-      <div class="w-full md:w-56">
-        <select
-          name="course"
-          data-auto-submit
-          class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-        >
-          <option value="all">{% trans "All Courses" %}</option>
-          {% for crs in courses %}
-            <option value="{{ crs.slug }}" {% if course_slug == crs.slug %}selected{% endif %}>
-              {{ crs.title|truncatechars:28 }}
-            </option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <!-- Status Tabs / Filter (Requirement 4: pending, active, revoked only) -->
-      <div class="flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-1 text-xs font-semibold">
-        <a
-          href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'all' %}bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-slate-900{% endif %}"
-        >
-          {% trans "All" %}
-        </a>
-        <a
-          href="?status=pending{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'pending' %}bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-amber-600{% endif %}"
-        >
-          {% trans "Pending" %}
-        </a>
-        <a
-          href="?status=active{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'active' %}bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600{% endif %}"
-        >
-          {% trans "Active" %}
-        </a>
-        <a
-          href="?status=revoked{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'revoked' %}bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-rose-600{% endif %}"
-        >
-          {% trans "Revoked" %}
-        </a>
-      </div>
-
-      <button
-        type="submit"
-        class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black dark:bg-slate-700 dark:hover:bg-slate-600 text-white text-sm font-semibold transition"
-      >
-        {% trans "Filter" %}
-      </button>
-
-      {% if search_query or status_filter != 'all' or course_slug != 'all' %}
-        <a
-          href="{% url 'dashboard:teacher_enrollments' %}"
-          class="px-3 py-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-sm font-semibold text-center transition"
-        >
-          {% trans "Reset" %}
-        </a>
-      {% endif %}
-    </form>
+  <div class="sp-chips">
+    <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}" class="sp-chip" {% if status_filter == 'all' %}aria-current="true"{% endif %}>
+      {% trans "All" %}
+    </a>
+    <a href="?status=pending{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}" class="sp-chip" {% if status_filter == 'pending' %}aria-current="true"{% endif %}>
+      {% trans "Pending" %}
+    </a>
+    <a href="?status=active{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}" class="sp-chip" {% if status_filter == 'active' %}aria-current="true"{% endif %}>
+      {% trans "Active" %}
+    </a>
+    <a href="?status=revoked{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}" class="sp-chip" {% if status_filter == 'revoked' %}aria-current="true"{% endif %}>
+      {% trans "Revoked" %}
+    </a>
   </div>
 
-  <!-- Bulk Actions Bar (Sticky/Floating when checkboxes checked) -->
+  <form method="get" class="sp-card sp-filter" role="search">
+    <div class="sp-filter-search">
+      <input
+        type="text"
+        name="q"
+        value="{{ search_query }}"
+        placeholder="{% trans 'Search by student name or email...' %}"
+        class="sp-input"
+        aria-label="{% trans 'Search by student name or email' %}"
+      >
+    </div>
+
+    <div class="sp-filter-field">
+      <select name="course" data-auto-submit class="sp-input" aria-label="{% trans 'Filter by course' %}">
+        <option value="all">{% trans "All Courses" %}</option>
+        {% for crs in courses %}
+          <option value="{{ crs.slug }}" {% if course_slug == crs.slug %}selected{% endif %}>
+            {{ crs.title|truncatechars:28 }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="sp-filter-actions">
+      <button type="submit" class="sp-btn">{% trans "Filter" %}</button>
+      {% if search_query or status_filter != 'all' or course_slug != 'all' %}
+        <a href="{% url 'dashboard:teacher_enrollments' %}" class="sp-btn sp-btn--ghost">{% trans "Reset" %}</a>
+      {% endif %}
+    </div>
+  </form>
+
   <form id="bulk-enrollment-form" method="post" action="{% url 'dashboard:teacher_enrollments_bulk_action' %}">
     {% csrf_token %}
     <input type="hidden" name="action" id="bulk-action-input" value="">
     <input type="hidden" name="next" value="{{ request.get_full_path }}">
 
-    <div
-      id="bulk-actions-bar"
-      class="hidden items-center justify-between p-4 mb-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 transition"
-    >
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white font-bold text-xs" id="selected-count-badge">
-          0
-        </span>
-        <span class="text-sm font-medium text-indigo-950 dark:text-indigo-200">
-          {% trans "enrollments selected on this page." %}
-        </span>
+    <div id="bulk-actions-bar" class="sp-bulkbar hidden">
+      <div class="sp-bulkbar-main">
+        <span class="sp-order" id="selected-count-badge">0</span>
+        <span class="sp-note">{% trans "enrollments selected on this page." %}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          data-bulk-action="approve"
-          class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition"
-        >
+      <div class="sp-actions">
+        <button type="button" data-bulk-action="approve" class="sp-btn sp-btn--sm">
           {% trans "Approve Selected" %}
         </button>
-        <button
-          type="button"
-          data-bulk-action="revoke"
-          class="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition"
-        >
+        <button type="button" data-bulk-action="revoke" class="sp-btn sp-btn--danger sp-btn--sm">
           {% trans "Revoke Selected" %}
         </button>
       </div>
     </div>
 
-    <!-- Enrollments List (Table on Desktop, Cards on Mobile) -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="sp-card">
       {% if enrollments %}
-        <!-- Desktop Table View -->
-        <div class="hidden md:block overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+        <div class="sp-table-wrap sp-only-desktop">
+          <table class="sp-table">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                <th class="p-4 w-10 text-center">
+              <tr>
+                <th>
                   <input
                     type="checkbox"
                     id="select-all-checkbox"
-                    class="rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                    aria-label="{% trans 'Select all enrollments' %}"
                   >
                 </th>
-                <th class="py-3 px-4">{% trans "Student" %}</th>
-                <th class="py-3 px-4">{% trans "Course" %}</th>
-                <th class="py-3 px-4">{% trans "Status" %}</th>
-                <th class="py-3 px-4">{% trans "Source" %}</th>
-                <th class="py-3 px-4">{% trans "Enrolled Date" %}</th>
-                <th class="py-3 px-4 text-right">{% trans "Actions" %}</th>
+                <th>{% trans "Student" %}</th>
+                <th>{% trans "Course" %}</th>
+                <th>{% trans "Status" %}</th>
+                <th>{% trans "Source" %}</th>
+                <th>{% trans "Enrolled Date" %}</th>
+                <th class="sp-text-right">{% trans "Actions" %}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+            <tbody>
               {% for enr in enrollments %}
-                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition">
-                  <td class="p-4 text-center">
+                <tr>
+                  <td>
                     <input
                       type="checkbox"
                       name="enrollment_ids"
                       value="{{ enr.id }}"
-                      class="enrollment-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                      class="enrollment-checkbox"
+                      aria-label="{% trans 'Select enrollment for' %} {{ enr.student.get_full_name|default:enr.student.email }}"
                     >
                   </td>
-                  <td class="py-3.5 px-4">
-                    <div class="font-semibold text-slate-900 dark:text-white">
-                      <a href="{% url 'dashboard:teacher_student_detail' student_id=enr.student.id %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">
-                        {{ enr.student.get_full_name|default:enr.student.email }}
-                      </a>
-                    </div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400">
-                      {{ enr.student.email }}
+                  <td>
+                    <div class="sp-cell-user">
+                      <span class="sp-av sp-av--sm" aria-hidden="true">{{ enr.student.get_full_name|default:enr.student.email|slice:":1"|upper }}</span>
+                      <div>
+                        <p class="sp-cell-title">
+                          <a href="{% url 'dashboard:teacher_student_detail' student_id=enr.student.id %}" class="sp-link">
+                            {{ enr.student.get_full_name|default:enr.student.email }}
+                          </a>
+                        </p>
+                        <p class="sp-cell-sub">{{ enr.student.email }}</p>
+                      </div>
                     </div>
                   </td>
-                  <td class="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-200">
-                    <a href="{% url 'courses:detail' slug=enr.course.slug %}" target="_blank" class="hover:underline">
+                  <td>
+                    <a href="{% url 'courses:detail' slug=enr.course.slug %}" target="_blank" class="sp-link">
                       {{ enr.course.title|truncatechars:32 }}
                     </a>
                   </td>
-                  <td class="py-3.5 px-4">
+                  <td>
                     {% if enr.status == 'pending' %}
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                        {% trans "Pending" %}
-                      </span>
+                      <span class="sp-badge sp-badge--warn">{% trans "Pending" %}</span>
                     {% elif enr.status == 'active' %}
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                        {% trans "Active" %}
-                      </span>
+                      <span class="sp-badge sp-badge--ok">{% trans "Active" %}</span>
                     {% elif enr.status == 'revoked' %}
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
-                        {% trans "Revoked" %}
-                      </span>
+                      <span class="sp-badge sp-badge--err">{% trans "Revoked" %}</span>
                     {% endif %}
                   </td>
-                  <td class="py-3.5 px-4 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    {{ enr.get_source_display }}
-                  </td>
-                  <td class="py-3.5 px-4 text-xs text-slate-500 dark:text-slate-400">
-                    {{ enr.created_at|date:"M j, Y, H:i" }}
-                  </td>
-                  <td class="py-3.5 px-4 text-right">
-                    <div class="inline-flex items-center gap-1.5">
+                  <td class="sp-mono-sm">{{ enr.get_source_display }}</td>
+                  <td class="sp-mono-sm">{{ enr.created_at|date:"M j, Y, H:i" }}</td>
+                  <td>
+                    <div class="sp-actions">
                       {% if enr.status == 'pending' %}
-                        <!-- Approve -->
-                        <button
-                          type="button"
-                          data-single-action="approve"
-                          data-enrollment-id="{{ enr.id }}"
-                          class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition"
-                        >
+                        <button type="button" data-single-action="approve" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--sm">
                           {% trans "Approve" %}
                         </button>
-                        <!-- Revoke -->
-                        <button
-                          type="button"
-                          data-single-action="revoke"
-                          data-enrollment-id="{{ enr.id }}"
-                          class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition"
-                        >
+                        <button type="button" data-single-action="revoke" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--danger sp-btn--sm">
                           {% trans "Reject" %}
                         </button>
                       {% elif enr.status == 'active' %}
-                        <!-- Revoke -->
-                        <button
-                          type="button"
-                          data-single-action="revoke"
-                          data-enrollment-id="{{ enr.id }}"
-                          class="px-2.5 py-1 rounded-lg border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-bold transition"
-                        >
+                        <button type="button" data-single-action="revoke" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--danger-outline sp-btn--sm">
                           {% trans "Revoke" %}
                         </button>
                       {% elif enr.status == 'revoked' %}
-                        <!-- Reactivate -->
-                        <button
-                          type="button"
-                          data-single-action="approve"
-                          data-enrollment-id="{{ enr.id }}"
-                          class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition"
-                        >
+                        <button type="button" data-single-action="approve" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--sm">
                           {% trans "Reactivate" %}
                         </button>
                       {% endif %}
                       <a
                         href="{% url 'dashboard:teacher_student_detail' student_id=enr.student.id %}"
-                        class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                        class="sp-btn sp-btn--ghost sp-btn--sm"
                         title="{% trans 'View Student Detail' %}"
+                        aria-label="{% trans 'View Student Detail' %}"
                       >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
+                        <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-chevron-right"/></svg>
                       </a>
                     </div>
                   </td>
@@ -326,84 +223,51 @@
           </table>
         </div>
 
-        <!-- Mobile Card View (390px friendly) -->
-        <div class="block md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+        <div class="sp-only-mobile">
           {% for enr in enrollments %}
-            <div class="p-4 space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-2.5">
-                  <input
-                    type="checkbox"
-                    name="enrollment_ids"
-                    value="{{ enr.id }}"
-                    class="enrollment-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500"
-                  >
-                  <div>
-                    <a href="{% url 'dashboard:teacher_student_detail' student_id=enr.student.id %}" class="font-bold text-sm text-slate-900 dark:text-white">
+            <div class="sp-item-row">
+              <div class="sp-item-main">
+                <input
+                  type="checkbox"
+                  name="enrollment_ids"
+                  value="{{ enr.id }}"
+                  class="enrollment-checkbox"
+                  aria-label="{% trans 'Select enrollment for' %} {{ enr.student.get_full_name|default:enr.student.email }}"
+                >
+                <div class="sp-item-info">
+                  <div class="sp-item-title">
+                    <a href="{% url 'dashboard:teacher_student_detail' student_id=enr.student.id %}" class="sp-link">
                       {{ enr.student.get_full_name|default:enr.student.email }}
                     </a>
-                    <p class="text-xs text-slate-500">{{ enr.student.email }}</p>
+                    {% if enr.status == 'pending' %}
+                      <span class="sp-badge sp-badge--warn">{% trans "Pending" %}</span>
+                    {% elif enr.status == 'active' %}
+                      <span class="sp-badge sp-badge--ok">{% trans "Active" %}</span>
+                    {% elif enr.status == 'revoked' %}
+                      <span class="sp-badge sp-badge--err">{% trans "Revoked" %}</span>
+                    {% endif %}
                   </div>
-                </div>
-                <div>
-                  {% if enr.status == 'pending' %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                      {% trans "Pending" %}
-                    </span>
-                  {% elif enr.status == 'active' %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                      {% trans "Active" %}
-                    </span>
-                  {% elif enr.status == 'revoked' %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
-                      {% trans "Revoked" %}
-                    </span>
-                  {% endif %}
+                  <p class="sp-item-meta">{{ enr.student.email }}</p>
+                  <p class="sp-item-meta">
+                    {{ enr.course.title }} &bull; {{ enr.get_source_display }} &bull; {{ enr.created_at|date:"M j, Y" }}
+                  </p>
                 </div>
               </div>
 
-              <div class="text-xs text-slate-600 dark:text-slate-400">
-                <p class="font-medium text-slate-800 dark:text-slate-200">{{ enr.course.title }}</p>
-                <div class="flex items-center justify-between mt-1 text-[11px] text-slate-400">
-                  <span>{{ enr.get_source_display }}</span>
-                  <span>{{ enr.created_at|date:"M j, Y" }}</span>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+              <div class="sp-course-actions">
                 {% if enr.status == 'pending' %}
-                  <button
-                    type="button"
-                    data-single-action="approve"
-                    data-enrollment-id="{{ enr.id }}"
-                    class="flex-1 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold text-center"
-                  >
+                  <button type="button" data-single-action="approve" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--sm">
                     {% trans "Approve" %}
                   </button>
-                  <button
-                    type="button"
-                    data-single-action="revoke"
-                    data-enrollment-id="{{ enr.id }}"
-                    class="flex-1 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold text-center"
-                  >
+                  <button type="button" data-single-action="revoke" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--danger sp-btn--sm">
                     {% trans "Reject" %}
                   </button>
                 {% elif enr.status == 'active' %}
-                  <button
-                    type="button"
-                    data-single-action="revoke"
-                    data-enrollment-id="{{ enr.id }}"
-                    class="flex-1 py-1.5 rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 text-xs font-bold text-center"
-                  >
+                  <button type="button" data-single-action="revoke" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--danger-outline sp-btn--sm">
                     {% trans "Revoke Access" %}
                   </button>
                 {% elif enr.status == 'revoked' %}
-                  <button
-                    type="button"
-                    data-single-action="approve"
-                    data-enrollment-id="{{ enr.id }}"
-                    class="flex-1 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold text-center"
-                  >
+                  <button type="button" data-single-action="approve" data-enrollment-id="{{ enr.id }}" class="sp-btn sp-btn--sm">
                     {% trans "Reactivate" %}
                   </button>
                 {% endif %}
@@ -412,131 +276,91 @@
           {% endfor %}
         </div>
       {% else %}
-        <!-- Empty State -->
-        <div class="p-12 text-center">
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 mb-3">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
-          </div>
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">
-            {% trans "No enrollments found" %}
-          </h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
-            {% trans "There are no student enrollments matching the selected filters. Use Manual Enrollment to enroll a student." %}
-          </p>
+        <div class="sp-empty">
+          <span class="sp-empty-icon" aria-hidden="true">
+            <svg class="sp-i"><use href="#i-user-plus"/></svg>
+          </span>
+          <b>{% trans "No enrollments found" %}</b>
+          <p>{% trans "There are no student enrollments matching the selected filters. Use Manual Enrollment to enroll a student." %}</p>
         </div>
       {% endif %}
     </div>
   </form>
 
-  <!-- Pagination -->
   {% if page_obj.has_other_pages %}
-    <div class="flex items-center justify-between pt-4">
-      <div class="text-xs text-slate-500">
+    <nav class="sp-card sp-pager" aria-label="Pagination">
+      <p class="sp-pager-info">
         {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
           Showing {{ start }} to {{ end }} of {{ total }} enrollments
         {% endblocktrans %}
-      </div>
-      <div class="flex items-center gap-2">
+      </p>
+      <div class="sp-pager-links">
         {% if page_obj.has_previous %}
           <a
             href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-            class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            class="sp-btn sp-btn--secondary sp-btn--sm"
           >
             {% trans "Previous" %}
           </a>
         {% endif %}
-        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 px-2">
-          {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-        </span>
+        <span class="sp-pager-info">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
           <a
             href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if course_slug != 'all' %}&course={{ course_slug }}{% endif %}"
-            class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            class="sp-btn sp-btn--secondary sp-btn--sm"
           >
             {% trans "Next" %}
           </a>
         {% endif %}
       </div>
-    </div>
+    </nav>
   {% endif %}
 </div>
 
-<!-- Single Action Form (Hidden, submitted via JS) -->
 <form id="single-enrollment-form" method="post" action="" class="hidden">
   {% csrf_token %}
   <input type="hidden" name="action" id="single-action-input" value="">
   <input type="hidden" name="next" value="{{ request.get_full_path }}">
 </form>
 
-<!-- Manual Enrollment Modal (Requirement 5) -->
-<div id="manual-enroll-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 flex items-center justify-center">
-  <div class="relative w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-xl transition-all">
-    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-      <h3 class="text-lg font-bold text-slate-900 dark:text-white">
-        {% trans "Manual Course Enrollment" %}
-      </h3>
-      <button type="button" data-modal-close="manual-enroll-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+<dialog class="sp-dialog" id="manual-enroll-modal" aria-labelledby="manual-enroll-title">
+  <div class="sp-dialog-head">
+    <h2 id="manual-enroll-title">{% trans "Manual Course Enrollment" %}</h2>
+    <button type="button" data-modal-close="manual-enroll-modal" class="sp-iconbtn" aria-label="{% trans 'Close' %}">
+      <svg class="sp-i" aria-hidden="true"><use href="#i-x"/></svg>
+    </button>
+  </div>
+
+  <form method="post" action="{% url 'dashboard:teacher_enrollment_manual' %}">
+    {% csrf_token %}
+    <div class="sp-field">
+      <label for="enroll-email">{% trans "Student Email Address" %} *</label>
+      <input type="email" name="email" id="enroll-email" required placeholder="student@example.com">
+      <p class="sp-help">{% trans "The student must already have an active registered student account." %}</p>
     </div>
 
-    <form method="post" action="{% url 'dashboard:teacher_enrollment_manual' %}" class="space-y-4 mt-4">
-      {% csrf_token %}
-      <div>
-        <label for="enroll-email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-          {% trans "Student Email Address" %} *
-        </label>
-        <input
-          type="email"
-          name="email"
-          id="enroll-email"
-          required
-          placeholder="student@example.com"
-          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-        >
-        <p class="text-xs text-slate-500 mt-1">
-          {% trans "The student must already have an active registered student account." %}
-        </p>
-      </div>
+    <div class="sp-field">
+      <label for="enroll-course">{% trans "Select Course" %} *</label>
+      <select name="course_id" id="enroll-course" required>
+        <option value="">{% trans "-- Choose a course --" %}</option>
+        {% for crs in courses %}
+          <option value="{{ crs.id }}">{{ crs.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
-      <div>
-        <label for="enroll-course" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-          {% trans "Select Course" %} *
-        </label>
-        <select
-          name="course_id"
-          id="enroll-course"
-          required
-          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-        >
-          <option value="">{% trans "-- Choose a course --" %}</option>
-          {% for crs in courses %}
-            <option value="{{ crs.id }}">{{ crs.title }}</option>
-          {% endfor %}
-        </select>
-      </div>
+    <div class="sp-actions">
+      <button type="button" data-modal-close="manual-enroll-modal" class="sp-btn sp-btn--secondary">
+        {% trans "Cancel" %}
+      </button>
+      <button type="submit" class="sp-btn">
+        {% trans "Enroll Student" %}
+      </button>
+    </div>
+  </form>
+</dialog>
+{% endblock %}
 
-      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-        <button
-          type="button"
-          data-modal-close="manual-enroll-modal"
-          class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-        >
-          {% trans "Cancel" %}
-        </button>
-        <button
-          type="submit"
-          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition"
-        >
-          {% trans "Enroll Student" %}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}" defer></script>
 {% endblock %}

@@ -1,255 +1,214 @@
-{% extends "dashboard/teacher_base.html" %}
+{% extends "teacher/base_figma.html" %}
 {% load i18n %}
 
-{% block teacher_title %}
+{% block title %}
+  {% if assignment %}{{ assignment.title }} - {% trans "Submissions" %}{% else %}{% trans "Submissions Queue" %}{% endif %} — Teacher Portal — {{ site_settings.site_name }}
+{% endblock title %}
+
+{% block breadcrumb %}
+<nav class="sp-crumbs" aria-label="Breadcrumb">
+  <a href="{% url 'dashboard:teacher' %}">{% trans "Teacher Portal" %}</a>
+  <span aria-hidden="true">&rsaquo;</span>
   {% if assignment %}
-    {{ assignment.title }} - {% trans "Submissions" %}
+    <a href="{% url 'dashboard:teacher_courses' %}">{% trans "Courses" %}</a>
+    <span aria-hidden="true">&rsaquo;</span>
+    <a href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}">{{ course.title }}</a>
+    <span aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">{{ assignment.title }}</span>
   {% else %}
-    {% trans "Submissions Queue" %}
+    <span aria-current="page">{% trans "Submissions Queue" %}</span>
+  {% endif %}
+</nav>
+{% endblock %}
+
+{% block page_title %}
+  {% if assignment %}{{ assignment.title }}{% else %}{% trans "Submissions & Grading Queue" %}{% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+  {% if assignment %}
+    {% trans "Due:" %} {{ assignment.due_at|date:"M j, Y, H:i" }} &bull; {% trans "Max Score:" %} {{ assignment.max_score }}
+  {% else %}
+    {% trans "Review, grade student submissions, and monitor assignment deadlines." %}
   {% endif %}
 {% endblock %}
 
-{% block dashboard_content %}
-<div class="space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-    <div>
-      {% if assignment %}
-        <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
-          <a href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}" class="hover:underline">
-            {{ course.title }}
-          </a>
-          <span>/</span>
-          <span>{% trans "Assignments" %}</span>
-        </div>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          {{ assignment.title }}
-        </h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-          {% trans "Due:" %} {{ assignment.due_at|date:"M j, Y, H:i" }} &bull; {% trans "Max Score:" %} {{ assignment.max_score }}
-        </p>
-      {% else %}
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          {% trans "Submissions & Grading Queue" %}
-        </h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          {% trans "Review, grade student submissions, and monitor assignment deadlines." %}
-        </p>
-      {% endif %}
+{% block header_actions %}
+{% if assignment %}
+  <a
+    href="{% url 'dashboard:teacher_missed_deadlines' slug=course.slug assignment_id=assignment.id %}"
+    class="sp-btn sp-btn--danger-outline"
+  >
+    <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-clock"/></svg>
+    <span>{% trans "Missed Deadlines" %} ({{ missed_count }})</span>
+  </a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="sp-stack">
+  <div class="sp-stats">
+    <div class="sp-card sp-stat">
+      <p class="sp-stat-value sp-err-text">{{ ungraded_count }}</p>
+      <p class="sp-stat-label">{% trans "Ungraded" %}</p>
+      <p class="sp-stat-hint">{% trans "Submissions awaiting score" %}</p>
+    </div>
+    <div class="sp-card sp-stat">
+      <p class="sp-stat-value sp-ok-text">{{ graded_count }}</p>
+      <p class="sp-stat-label">{% trans "Graded" %}</p>
+      <p class="sp-stat-hint">{% trans "Completed reviews" %}</p>
+    </div>
+    <div class="sp-card sp-stat">
+      <p class="sp-stat-value sp-warn-text">{{ late_count }}</p>
+      <p class="sp-stat-label">{% trans "Late Submissions" %}</p>
+      <p class="sp-stat-hint">{% trans "Turned in after due date" %}</p>
+    </div>
+    <div class="sp-card sp-stat">
+      <p class="sp-stat-value">{{ total_count }}</p>
+      <p class="sp-stat-label">{% trans "Total Submissions" %}</p>
+      <p class="sp-stat-hint">{% trans "In current queue" %}</p>
+    </div>
+  </div>
+
+  <div class="sp-chips">
+    <a
+      href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
+      class="sp-chip"
+      {% if status_filter == 'all' %}aria-current="true"{% endif %}
+    >
+      {% trans "All" %}
+    </a>
+    <a
+      href="?status=ungraded{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
+      class="sp-chip"
+      {% if status_filter == 'ungraded' %}aria-current="true"{% endif %}
+    >
+      {% trans "Ungraded" %}
+    </a>
+    <a
+      href="?status=graded{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
+      class="sp-chip"
+      {% if status_filter == 'graded' %}aria-current="true"{% endif %}
+    >
+      {% trans "Graded" %}
+    </a>
+  </div>
+
+  <form method="get" class="sp-card sp-filter" role="search">
+    <div class="sp-filter-search">
+      <input
+        type="text"
+        name="q"
+        value="{{ search_query }}"
+        placeholder="{% trans 'Search by student name or email...' %}"
+        class="sp-input"
+        aria-label="{% trans 'Search by student name or email' %}"
+      >
     </div>
 
-    {% if assignment %}
-      <div class="flex items-center gap-2">
-        <a
-          href="{% url 'dashboard:teacher_missed_deadlines' slug=course.slug assignment_id=assignment.id %}"
-          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 transition"
-        >
-          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{% trans "Missed Deadlines" %} ({{ missed_count }})</span>
-        </a>
+    {% if not assignment %}
+      <div class="sp-filter-field">
+        <select name="course" data-auto-submit class="sp-input" aria-label="{% trans 'Filter by course' %}">
+          <option value="all">{% trans "All Courses" %}</option>
+          {% for crs in courses %}
+            <option value="{{ crs.slug }}" {% if course_slug == crs.slug %}selected{% endif %}>
+              {{ crs.title|truncatechars:28 }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
     {% endif %}
-  </div>
 
-  <!-- Metric Quick Counts -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-      <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Ungraded" %}</span>
-      <p class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-2">{{ ungraded_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Submissions awaiting score" %}</p>
-    </div>
-    <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-      <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Graded" %}</span>
-      <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2">{{ graded_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Completed reviews" %}</p>
-    </div>
-    <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-      <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Late Submissions" %}</span>
-      <p class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-2">{{ late_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "Turned in after due date" %}</p>
-    </div>
-    <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-      <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{% trans "Total Submissions" %}</span>
-      <p class="text-2xl font-black text-slate-900 dark:text-white mt-2">{{ total_count }}</p>
-      <p class="text-xs text-slate-500 mt-1">{% trans "In current queue" %}</p>
-    </div>
-  </div>
-
-  <!-- Filters & Search Toolbar -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs">
-    <form method="get" class="flex flex-col md:flex-row gap-3">
-      <!-- Search Input -->
-      <div class="relative flex-1">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <input
-          type="text"
-          name="q"
-          value="{{ search_query }}"
-          placeholder="{% trans 'Search by student name or email...' %}"
-          class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-        >
-      </div>
-
-      {% if not assignment %}
-        <!-- Course Selector -->
-        <div class="w-full md:w-56">
-          <select
-            name="course"
-            data-auto-submit
-            class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-          >
-            <option value="all">{% trans "All Courses" %}</option>
-            {% for crs in courses %}
-              <option value="{{ crs.slug }}" {% if course_slug == crs.slug %}selected{% endif %}>
-                {{ crs.title|truncatechars:28 }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-      {% endif %}
-
-      <!-- Status Filter Tabs -->
-      <div class="flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-1 text-xs font-semibold">
-        <a
-          href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'all' %}bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-slate-900{% endif %}"
-        >
-          {% trans "All" %}
-        </a>
-        <a
-          href="?status=ungraded{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'ungraded' %}bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-rose-600{% endif %}"
-        >
-          {% trans "Ungraded" %}
-        </a>
-        <a
-          href="?status=graded{% if search_query %}&q={{ search_query }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
-          class="px-3 py-1.5 rounded-lg transition {% if status_filter == 'graded' %}bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs{% else %}text-slate-600 dark:text-slate-400 hover:text-emerald-600{% endif %}"
-        >
-          {% trans "Graded" %}
-        </a>
-      </div>
-
-      <button
-        type="submit"
-        class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black dark:bg-slate-700 dark:hover:bg-slate-600 text-white text-sm font-semibold transition"
-      >
-        {% trans "Filter" %}
-      </button>
-
+    <div class="sp-filter-actions">
+      <button type="submit" class="sp-btn">{% trans "Filter" %}</button>
       {% if search_query or status_filter != 'all' or course_slug != 'all' or timeliness_filter != 'all' %}
         <a
           href="{% if assignment %}{% url 'dashboard:teacher_course_assignment_submissions' slug=course.slug assignment_id=assignment.id %}{% else %}{% url 'dashboard:teacher_submissions' %}{% endif %}"
-          class="px-3 py-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-sm font-semibold text-center transition"
+          class="sp-btn sp-btn--ghost"
         >
           {% trans "Reset" %}
         </a>
       {% endif %}
-    </form>
-  </div>
+    </div>
+  </form>
 
-  <!-- Submissions Table / Cards -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+  <div class="sp-card">
     {% if submissions %}
-      <!-- Desktop Table View -->
-      <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+      <div class="sp-table-wrap sp-only-desktop">
+        <table class="sp-table">
           <thead>
-            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              <th class="py-3 px-4">{% trans "Student" %}</th>
+            <tr>
+              <th>{% trans "Student" %}</th>
               {% if not assignment %}
-                <th class="py-3 px-4">{% trans "Assignment / Course" %}</th>
+                <th>{% trans "Assignment / Course" %}</th>
               {% endif %}
-              <th class="py-3 px-4">{% trans "Response Preview" %}</th>
-              <th class="py-3 px-4">{% trans "Submitted Time" %}</th>
-              <th class="py-3 px-4">{% trans "Timeliness" %}</th>
-              <th class="py-3 px-4">{% trans "Grade" %}</th>
-              <th class="py-3 px-4 text-right">{% trans "Actions" %}</th>
+              <th>{% trans "Response Preview" %}</th>
+              <th>{% trans "Submitted Time" %}</th>
+              <th>{% trans "Timeliness" %}</th>
+              <th>{% trans "Grade" %}</th>
+              <th class="sp-text-right">{% trans "Actions" %}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+          <tbody>
             {% for sub in submissions %}
-              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition">
-                <td class="py-3.5 px-4">
-                  <div class="font-semibold text-slate-900 dark:text-white">
-                    <a href="{% url 'dashboard:teacher_student_detail' student_id=sub.student.id %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">
-                      {{ sub.student.get_full_name|default:sub.student.email }}
-                    </a>
-                  </div>
-                  <div class="text-xs text-slate-500 dark:text-slate-400">
-                    {{ sub.student.email }}
+              <tr>
+                <td>
+                  <div class="sp-cell-user">
+                    <span class="sp-av sp-av--sm" aria-hidden="true">{{ sub.student.get_full_name|default:sub.student.email|slice:":1"|upper }}</span>
+                    <div>
+                      <p class="sp-cell-title">
+                        <a href="{% url 'dashboard:teacher_student_detail' student_id=sub.student.id %}" class="sp-link">
+                          {{ sub.student.get_full_name|default:sub.student.email }}
+                        </a>
+                      </p>
+                      <p class="sp-cell-sub">{{ sub.student.email }}</p>
+                    </div>
                   </div>
                 </td>
                 {% if not assignment %}
-                  <td class="py-3.5 px-4">
-                    <div class="font-medium text-slate-900 dark:text-white">
-                      {{ sub.assignment.title }}
-                    </div>
-                    <div class="text-xs text-slate-500">
-                      {{ sub.assignment.course.title }}
-                    </div>
+                  <td>
+                    <p class="sp-cell-title">{{ sub.assignment.title }}</p>
+                    <p class="sp-cell-sub">{{ sub.assignment.course.title }}</p>
                   </td>
                 {% endif %}
-                <td class="py-3.5 px-4 max-w-xs">
+                <td>
                   {% if sub.content_text %}
-                    <p class="text-xs text-slate-700 dark:text-slate-300 line-clamp-2 break-words" title="{{ sub.content_text|striptags }}">
-                      {{ sub.content_text|truncatechars:75 }}
-                    </p>
+                    <p class="sp-cell-sub" title="{{ sub.content_text|striptags }}">{{ sub.content_text|truncatechars:75 }}</p>
                   {% elif sub.file %}
-                    <span class="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                      <span class="truncate">{{ sub.original_filename|default:sub.file.name|truncatechars:25 }}</span>
+                    <span class="sp-badge">
+                      <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-link"/></svg>
+                      <span>{{ sub.original_filename|default:sub.file.name|truncatechars:25 }}</span>
                     </span>
                   {% else %}
-                    <span class="text-xs italic text-slate-400">{% trans "Empty" %}</span>
+                    <span class="sp-note"><i>{% trans "Empty" %}</i></span>
                   {% endif %}
                 </td>
-                <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-400">
-                  {{ sub.submitted_at|date:"M j, Y, H:i" }}
-                </td>
-                <td class="py-3.5 px-4">
+                <td class="sp-mono-sm">{{ sub.submitted_at|date:"M j, Y, H:i" }}</td>
+                <td>
                   {% if sub.is_late %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                      {% trans "Late" %}
-                    </span>
+                    <span class="sp-badge sp-badge--warn">{% trans "Late" %}</span>
                   {% else %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                      {% trans "On Time" %}
-                    </span>
+                    <span class="sp-badge sp-badge--ok">{% trans "On Time" %}</span>
                   {% endif %}
                 </td>
-                <td class="py-3.5 px-4">
+                <td>
                   {% if sub.grade is not None %}
-                    <span class="font-bold text-slate-900 dark:text-white">
-                      {{ sub.grade }}
-                    </span>
-                    <span class="text-xs text-slate-400">/ {{ sub.assignment.max_score }}</span>
+                    <b>{{ sub.grade }}</b>
+                    <span class="sp-note">/ {{ sub.assignment.max_score }}</span>
                   {% else %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
-                      {% trans "Ungraded" %}
-                    </span>
+                    <span class="sp-badge sp-badge--err">{% trans "Ungraded" %}</span>
                   {% endif %}
                 </td>
-                <td class="py-3.5 px-4 text-right">
-                  <a
-                    href="{% url 'dashboard:teacher_submission_grade' submission_id=sub.id %}"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition {% if sub.grade is None %}bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs{% else %}border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800{% endif %}"
-                  >
-                    {% if sub.grade is None %}
-                      <span>{% trans "Grade" %}</span>
-                    {% else %}
-                      <span>{% trans "Review / Regrade" %}</span>
-                    {% endif %}
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
+                <td>
+                  <div class="sp-actions">
+                    <a
+                      href="{% url 'dashboard:teacher_submission_grade' submission_id=sub.id %}"
+                      class="{% if sub.grade is None %}sp-btn sp-btn--sm{% else %}sp-btn sp-btn--secondary sp-btn--sm{% endif %}"
+                    >
+                      {% if sub.grade is None %}{% trans "Grade" %}{% else %}{% trans "Review / Regrade" %}{% endif %}
+                      <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+                    </a>
+                  </div>
                 </td>
               </tr>
             {% endfor %}
@@ -257,60 +216,47 @@
         </table>
       </div>
 
-      <!-- Mobile Card View (390px friendly) -->
-      <div class="block md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+      <div class="sp-only-mobile">
         {% for sub in submissions %}
-          <div class="p-4 space-y-3">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <a href="{% url 'dashboard:teacher_student_detail' student_id=sub.student.id %}" class="font-bold text-sm text-slate-900 dark:text-white">
-                  {{ sub.student.get_full_name|default:sub.student.email }}
-                </a>
-                <p class="text-xs text-slate-500">{{ sub.student.email }}</p>
-              </div>
-              <div>
-                {% if sub.grade is not None %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    {{ sub.grade }} / {{ sub.assignment.max_score }}
-                  </span>
-                {% else %}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
-                    {% trans "Ungraded" %}
+          <div class="sp-item-row">
+            <div class="sp-item-main">
+              <div class="sp-item-info">
+                <div class="sp-item-title">
+                  <a href="{% url 'dashboard:teacher_student_detail' student_id=sub.student.id %}" class="sp-link">
+                    {{ sub.student.get_full_name|default:sub.student.email }}
+                  </a>
+                  {% if sub.grade is not None %}
+                    <span class="sp-badge sp-badge--ok">{{ sub.grade }} / {{ sub.assignment.max_score }}</span>
+                  {% else %}
+                    <span class="sp-badge sp-badge--err">{% trans "Ungraded" %}</span>
+                  {% endif %}
+                </div>
+                <p class="sp-item-meta">{{ sub.student.email }}</p>
+
+                {% if not assignment %}
+                  <p class="sp-item-meta">{{ sub.assignment.title }} &bull; {{ sub.assignment.course.title }}</p>
+                {% endif %}
+
+                {% if sub.content_text %}
+                  <p class="sp-item-meta">{{ sub.content_text|truncatechars:100 }}</p>
+                {% elif sub.file %}
+                  <span class="sp-badge">
+                    <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-link"/></svg>
+                    <span>{{ sub.original_filename|default:sub.file.name }}</span>
                   </span>
                 {% endif %}
+
+                <p class="sp-item-meta">
+                  {% if sub.is_late %}<span class="sp-warn-text">{% trans "Late" %}</span> &bull; {% endif %}
+                  {{ sub.submitted_at|date:"M j, H:i" }}
+                </p>
               </div>
             </div>
 
-            {% if not assignment %}
-              <div class="text-xs text-slate-600 dark:text-slate-400">
-                <p class="font-medium text-slate-800 dark:text-slate-200">{{ sub.assignment.title }}</p>
-                <p class="text-[11px] text-slate-400">{{ sub.assignment.course.title }}</p>
-              </div>
-            {% endif %}
-
-            {% if sub.content_text %}
-              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 line-clamp-2 break-words">
-                {{ sub.content_text|truncatechars:100 }}
-              </div>
-            {% elif sub.file %}
-              <div class="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                <span class="truncate">{{ sub.original_filename|default:sub.file.name }}</span>
-              </div>
-            {% endif %}
-
-            <div class="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800">
-              <div class="flex items-center gap-1.5">
-                {% if sub.is_late %}
-                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                    {% trans "Late" %}
-                  </span>
-                {% endif %}
-                <span>{{ sub.submitted_at|date:"M j, H:i" }}</span>
-              </div>
+            <div class="sp-course-actions">
               <a
                 href="{% url 'dashboard:teacher_submission_grade' submission_id=sub.id %}"
-                class="px-3 py-1 rounded-lg text-xs font-bold {% if sub.grade is None %}bg-indigo-600 text-white{% else %}border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300{% endif %}"
+                class="{% if sub.grade is None %}sp-btn sp-btn--sm{% else %}sp-btn sp-btn--secondary sp-btn--sm{% endif %}"
               >
                 {% if sub.grade is None %}{% trans "Grade" %}{% else %}{% trans "Review" %}{% endif %}
               </a>
@@ -319,53 +265,43 @@
         {% endfor %}
       </div>
     {% else %}
-      <!-- Empty State -->
-      <div class="p-12 text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 mb-3">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-slate-900 dark:text-white">
-          {% trans "No submissions found" %}
-        </h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
-          {% trans "There are no student submissions matching your current search or filter criteria." %}
-        </p>
+      <div class="sp-empty">
+        <span class="sp-empty-icon" aria-hidden="true">
+          <svg class="sp-i"><use href="#i-clipboard"/></svg>
+        </span>
+        <b>{% trans "No submissions found" %}</b>
+        <p>{% trans "There are no student submissions matching your current search or filter criteria." %}</p>
       </div>
     {% endif %}
   </div>
 
-  <!-- Pagination -->
   {% if page_obj.has_other_pages %}
-    <div class="flex items-center justify-between pt-4">
-      <div class="text-xs text-slate-500">
+    <nav class="sp-card sp-pager" aria-label="Pagination">
+      <p class="sp-pager-info">
         {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
           Showing {{ start }} to {{ end }} of {{ total }} submissions
         {% endblocktrans %}
-      </div>
-      <div class="flex items-center gap-2">
+      </p>
+      <div class="sp-pager-links">
         {% if page_obj.has_previous %}
           <a
             href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
-            class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            class="sp-btn sp-btn--secondary sp-btn--sm"
           >
             {% trans "Previous" %}
           </a>
         {% endif %}
-        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 px-2">
-          {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-        </span>
+        <span class="sp-pager-info">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
           <a
             href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if course_slug and course_slug != 'all' %}&course={{ course_slug }}{% endif %}{% if timeliness_filter != 'all' %}&timeliness={{ timeliness_filter }}{% endif %}"
-            class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            class="sp-btn sp-btn--secondary sp-btn--sm"
           >
             {% trans "Next" %}
           </a>
         {% endif %}
       </div>
-    </div>
+    </nav>
   {% endif %}
 </div>
 {% endblock %}

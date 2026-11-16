@@ -16,12 +16,12 @@
 <a class="sp-skip" href="#sp-content">Skip to content</a>
 <div class="sp-shell">
   {% include "teacher/partials/_sidebar.html" %}
-  <div class="sp-scrim" data-sp-close></div>
   <main class="sp-main" id="sp-content">
     <div class="sp-topbar">
       <button type="button" class="sp-iconbtn" data-sp-open aria-label="Open menu"><svg class="sp-i" aria-hidden="true"><use href="#i-menu"/></svg></button>
       <strong>Suren Sir</strong>
     </div>
+    {% block breadcrumb %}{% endblock %}
     <header class="sp-head">
       <div class="sp-head-txt">
         <h1>{% block page_title %}Overview{% endblock %}</h1>
@@ -33,6 +33,7 @@
     {% block content %}{% endblock %}
   </main>
 </div>
+<div class="sp-scrim" data-sp-close></div>
 <dialog class="sp-dialog" id="sp-confirm" aria-labelledby="sp-confirm-h">
   <form method="dialog">
     <h2 id="sp-confirm-h">Are you sure?</h2>

@@ -31,6 +31,13 @@
     } else if (t.closest("[data-sp-open]")) { d.body.classList.add("sp-nav-open"); }
     else if (t.closest("[data-sp-close]")) { d.body.classList.remove("sp-nav-open"); }
     else if (t.closest("[data-sp-dismiss]")) { t.closest(".sp-toast").remove(); }
+    else if (t.closest("[data-modal-open]")) {
+      var mo = d.getElementById(t.closest("[data-modal-open]").getAttribute("data-modal-open"));
+      if (mo) { if (mo.showModal) mo.showModal(); else { mo.classList.remove("hidden"); mo.classList.add("flex"); } }
+    } else if (t.closest("[data-modal-close]")) {
+      var mc = d.getElementById(t.closest("[data-modal-close]").getAttribute("data-modal-close"));
+      if (mc) { if (mc.close && mc.open) mc.close(); else { mc.classList.add("hidden"); mc.classList.remove("flex"); } }
+    }
   });
   d.addEventListener("keydown", function (e) { if (e.key === "Escape") d.body.classList.remove("sp-nav-open"); });
 
@@ -53,4 +60,9 @@
 
   // Success messages fade out after 5s; errors stay until dismissed.
   setTimeout(function () { d.querySelectorAll(".sp-toast--success,.sp-toast--info").forEach(function (n) { n.remove(); }); }, 5000);
+
+  // Auto-submit filter controls (any element with data-auto-submit).
+  d.querySelectorAll("[data-auto-submit]").forEach(function (el) {
+    el.addEventListener("change", function () { if (el.form) el.form.submit(); });
+  });
 })();

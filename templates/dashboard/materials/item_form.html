@@ -1,253 +1,176 @@
-{% extends "dashboard/teacher_base.html" %}
+{% extends "teacher/base_figma.html" %}
+{% load static %}
 
 {% block title %}{% if is_create %}New Resource Item{% else %}Edit Item: {{ item.title }}{% endif %} — {{ site_settings.site_name }}{% endblock title %}
 
-{% block dashboard_content %}
-<div class="max-w-2xl">
-  <!-- Breadcrumb -->
-  <nav class="mb-6 flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400" aria-label="Breadcrumb">
-    <a href="{% url 'dashboard:teacher' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Teacher Portal
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <a href="{% url 'dashboard:teacher_course_materials' course.slug %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Materials
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <span class="font-medium text-slate-900 dark:text-white truncate" aria-current="page">
-      {% if is_create %}Add Item{% else %}Edit Item{% endif %}
-    </span>
-  </nav>
+{% block breadcrumb %}
+<nav class="sp-crumbs" aria-label="Breadcrumb">
+  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
+  <span aria-hidden="true">&rsaquo;</span>
+  <a href="{% url 'dashboard:teacher_course_materials' course.slug %}">Materials</a>
+  <span aria-hidden="true">&rsaquo;</span>
+  <span aria-current="page">{% if is_create %}Add Item{% else %}Edit Item{% endif %}</span>
+</nav>
+{% endblock %}
 
-  <!-- Header -->
-  <div class="mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight font-display">
-      {% if is_create %}Add Resource Item{% else %}Edit Resource Item{% endif %}
-    </h1>
-    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-      Post: <strong class="text-slate-900 dark:text-white">{{ material.title }}</strong> &bull; Course: {{ course.title }}
-    </p>
-  </div>
+{% block page_title %}{% if is_create %}Add Resource Item{% else %}Edit Resource Item{% endif %}{% endblock %}
+{% block page_subtitle %}Post: <strong>{{ material.title }}</strong> &bull; Course: {{ course.title }}{% endblock %}
 
-  <!-- Form -->
-  <form method="post" enctype="multipart/form-data" class="space-y-6">
+{% block content %}
+<div class="sp-card sp-pad sp-max">
+  <form method="post" enctype="multipart/form-data" class="sp-stack">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
-      <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 text-sm">
-        {{ form.non_field_errors }}
+      <div class="sp-banner sp-banner--err" role="alert">
+        <div class="sp-banner-main">
+          <span class="sp-order" aria-hidden="true">
+            <svg class="sp-i sp-i--sm"><use href="#i-help"/></svg>
+          </span>
+          <div>
+            {% for error in form.non_field_errors %}
+              <p class="sp-error">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     {% endif %}
 
-    <!-- Title -->
-    <div>
-      <label for="id_title" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-        Item Title <span class="text-rose-500">*</span>
-      </label>
-      <input
-        type="text"
-        name="title"
-        id="id_title"
-        value="{{ form.title.value|default:'' }}"
-        required
-        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        placeholder="e.g. Architecture Reference Diagram"
-      >
-      {% if form.title.errors %}
-        <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ form.title.errors.0 }}</p>
-      {% endif %}
+    <div class="sp-field{% if form.title.errors %} sp-field--err{% endif %}">
+      <label for="id_title">Item Title <span aria-hidden="true">*</span></label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
     </div>
 
-    <!-- Item Type -->
-    <div>
-      <label for="id_item_type" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-        Item Type <span class="text-rose-500">*</span>
-      </label>
-      <select
-        name="item_type"
-        id="id_item_type"
-        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
+    <div class="sp-field{% if form.item_type.errors %} sp-field--err{% endif %}">
+      <label for="id_item_type">Item Type <span aria-hidden="true">*</span></label>
+      <select name="item_type" id="id_item_type">
         {% for x, y in form.fields.item_type.choices %}
           <option value="{{ x }}" {% if form.item_type.value|stringformat:"s" == x|stringformat:"s" %}selected{% endif %}>
             {{ y }}
           </option>
         {% endfor %}
       </select>
-      {% if form.item_type.errors %}
-        <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ form.item_type.errors.0 }}</p>
-      {% endif %}
+      {% for e in form.item_type.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
     </div>
 
-    <!-- File Fields (shown when type == 'file') -->
-    <div id="file_fields_container" class="space-y-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white">File Configuration</h3>
+    <div id="file_fields_container" class="sp-form-section sp-field">
+      <h2>File Configuration</h2>
 
       {% if item and item.file %}
-        <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
-          <p class="font-semibold text-slate-900 dark:text-white mb-1">Current Stored File:</p>
-          <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ item.original_filename|default:item.file.name }}</span>
-          <span class="ml-2 text-slate-500">({{ item.file_size_bytes|filesizeformat }})</span>
-          <div class="mt-2 text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-medium">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Uploading a new file will replace this one and automatically delete the old file. Existing student download approvals will remain valid.</span>
+        <div class="sp-banner">
+          <div class="sp-banner-main">
+            <span class="sp-order" aria-hidden="true">
+              <svg class="sp-i sp-i--sm"><use href="#i-file"/></svg>
+            </span>
+            <div>
+              <p class="sp-banner-title">Current Stored File</p>
+              <p class="sp-banner-text">
+                <code>{{ item.original_filename|default:item.file.name }}</code>
+                <span class="sp-note">({{ item.file_size_bytes|filesizeformat }})</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sp-banner sp-banner--warn sp-mt">
+          <div class="sp-banner-main">
+            <span class="sp-order" aria-hidden="true">
+              <svg class="sp-i sp-i--sm"><use href="#i-help"/></svg>
+            </span>
+            <p class="sp-banner-text">
+              Uploading a new file will replace this one and automatically delete the old file.
+              Existing student download approvals will remain valid.
+            </p>
           </div>
         </div>
       {% endif %}
 
-      <div>
-        <label for="id_file" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-          {% if item and item.file %}Replace File (Optional){% else %}Upload File <span class="text-rose-500">*</span>{% endif %}
+      <div class="sp-field{% if form.file.errors %} sp-field--err{% endif %}">
+        <label for="id_file">
+          {% if item and item.file %}Replace File (Optional){% else %}Upload File <span aria-hidden="true">*</span>{% endif %}
         </label>
-        <input
-          type="file"
-          name="file"
-          id="id_file"
-          class="w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-950 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900 cursor-pointer"
-        >
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          PDF, Word (.docx), PowerPoint (.pptx), text (.txt), or images (PNG/JPG). Maximum file size: 25 MB.
-        </p>
-        {% if form.file.errors %}
-          <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ form.file.errors.0 }}</p>
-        {% endif %}
+        <input type="file" name="file" id="id_file">
+        <p class="sp-help">PDF, Word (.docx), PowerPoint (.pptx), text (.txt), or images (PNG/JPG). Maximum file size: 25 MB.</p>
+        {% for e in form.file.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
       </div>
 
-      <div>
-        <label for="id_download_policy" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-          Initial Download Policy
-        </label>
-        <select
-          name="download_policy"
-          id="id_download_policy"
-          class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
+      <div class="sp-field{% if form.download_policy.errors %} sp-field--err{% endif %}">
+        <label for="id_download_policy">Initial Download Policy</label>
+        <select name="download_policy" id="id_download_policy">
           {% for x, y in form.fields.download_policy.choices %}
             <option value="{{ x }}" {% if form.download_policy.value|stringformat:"s" == x|stringformat:"s" %}selected{% endif %}>
               {{ y }}
             </option>
           {% endfor %}
         </select>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Note: "View Only" is strictly restricted to PDF documents and image files (PNG, JPG).
-        </p>
-        {% if form.download_policy.errors %}
-          <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ form.download_policy.errors.0 }}</p>
-        {% endif %}
+        <p class="sp-help">Note: "View Only" is strictly restricted to PDF documents and image files (PNG, JPG).</p>
+        {% for e in form.download_policy.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
       </div>
     </div>
 
-    <!-- Link Fields (shown when type == 'link') -->
-    <div id="link_fields_container" class="space-y-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white">External Link Configuration</h3>
-      <div>
-        <label for="id_external_url" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-          Destination URL <span class="text-rose-500">*</span>
-        </label>
-        <input
-          type="url"
-          name="external_url"
-          id="id_external_url"
-          value="{{ form.external_url.value|default:'' }}"
-          class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="https://example.com/documentation"
-        >
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Must begin with http:// or https:// without embedded credentials or spaces.
-        </p>
-        {% if form.external_url.errors %}
-          <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ form.external_url.errors.0 }}</p>
-        {% endif %}
+    <div id="link_fields_container" class="sp-form-section sp-field">
+      <h2>External Link Configuration</h2>
+      <div class="sp-field{% if form.external_url.errors %} sp-field--err{% endif %}">
+        <label for="id_external_url">Destination URL <span aria-hidden="true">*</span></label>
+        {{ form.external_url }}
+        <p class="sp-help">Must begin with http:// or https:// without embedded credentials or spaces.</p>
+        {% for e in form.external_url.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
       </div>
     </div>
 
-    <!-- Video Fields (shown when type == 'video') -->
-    <div id="video_fields_container" class="space-y-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white">Video Configuration</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label for="id_video_provider" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-            Provider
-          </label>
-          <select
-            name="video_provider"
-            id="id_video_provider"
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
+    <div id="video_fields_container" class="sp-form-section sp-field">
+      <h2>Video Configuration</h2>
+
+      <div class="sp-form-grid">
+        <div class="sp-field{% if form.video_provider.errors %} sp-field--err{% endif %}">
+          <label for="id_video_provider">Provider</label>
+          <select name="video_provider" id="id_video_provider">
             {% for x, y in form.fields.video_provider.choices %}
               <option value="{{ x }}" {% if form.video_provider.value|stringformat:"s" == x|stringformat:"s" %}selected{% endif %}>
                 {{ y }}
               </option>
             {% endfor %}
           </select>
+          {% for e in form.video_provider.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
         </div>
+
+        <div class="sp-field{% if form.video_id.errors %} sp-field--err{% endif %}">
+          <label for="id_video_id">Video ID or URL <span aria-hidden="true">*</span></label>
+          {{ form.video_id }}
+          {% for e in form.video_id.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="sp-field{% if form.video_hash.errors %} sp-field--err{% endif %}">
+        <label for="id_video_hash">Privacy Hash (Optional, for Vimeo/Bunny)</label>
+        {{ form.video_hash }}
+        {% for e in form.video_hash.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
+      </div>
+    </div>
+
+    <div class="sp-form-section sp-field">
+      <h2>Publishing Status</h2>
+      <div class="sp-check">
+        {{ form.is_published }}
         <div>
-          <label for="id_video_id" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-            Video ID or URL <span class="text-rose-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="video_id"
-            id="id_video_id"
-            value="{{ form.video_id.value|default:'' }}"
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="e.g. dQw4w9WgXcQ"
-          >
-          {% if form.video_id.errors %}
-            <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ form.video_id.errors.0 }}</p>
-          {% endif %}
+          <label for="{{ form.is_published.id_for_label }}">Item is published (visible to students)</label>
+          {% for e in form.is_published.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
         </div>
       </div>
-      <div>
-        <label for="id_video_hash" class="block text-sm font-semibold text-slate-900 dark:text-white mb-1.5">
-          Privacy Hash (Optional, for Vimeo/Bunny)
-        </label>
-        <input
-          type="text"
-          name="video_hash"
-          id="id_video_hash"
-          value="{{ form.video_hash.value|default:'' }}"
-          class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-      </div>
     </div>
 
-    <!-- Published Status -->
-    <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
-      <div class="flex items-center gap-3">
-        <input
-          type="checkbox"
-          name="is_published"
-          id="id_is_published"
-          {% if form.is_published.value %}checked{% endif %}
-          class="w-4 h-4 rounded text-indigo-600 border-slate-300 dark:border-slate-700 focus:ring-indigo-500"
-        >
-        <label for="id_is_published" class="text-sm font-medium text-slate-900 dark:text-white">
-          Item is published (visible to students)
-        </label>
-      </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="flex items-center gap-3 pt-4">
-      <button
-        type="submit"
-        class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        {% if is_create %}Add Item{% else %}Save Item{% endif %}
-      </button>
-      <a
-        href="{% url 'dashboard:teacher_course_materials' course.slug %}"
-        class="px-5 py-2.5 rounded-xl font-semibold text-sm border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-      >
+    <div class="sp-form-actions">
+      <a href="{% url 'dashboard:teacher_course_materials' course.slug %}" class="sp-btn sp-btn--secondary">
         Cancel
       </a>
+      <button type="submit" class="sp-btn">
+        {% if is_create %}Add Item{% else %}Save Item{% endif %}
+      </button>
     </div>
   </form>
 </div>
+{% endblock %}
 
-{% endblock dashboard_content %}
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}" defer></script>
+{% endblock %}

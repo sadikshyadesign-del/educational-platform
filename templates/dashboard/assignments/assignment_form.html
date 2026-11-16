@@ -1,205 +1,121 @@
-{% extends "dashboard/teacher_base.html" %}
+{% extends "teacher/base_figma.html" %}
+{% load static %}
 
 {% block title %}{% if is_create %}Create Assignment{% else %}Edit Assignment: {{ assignment.title }}{% endif %} — {{ course.title }} — {{ site_settings.site_name }}{% endblock title %}
 
-{% block dashboard_content %}
-<div>
-  <!-- Breadcrumb -->
-  <nav class="mb-6 flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400" aria-label="Breadcrumb">
-    <a href="{% url 'dashboard:teacher' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Teacher Portal
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <a href="{% url 'dashboard:teacher_courses' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Courses
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <a href="{% url 'dashboard:teacher_assignments' course.slug %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate max-w-xs">
-      {{ course.title }} Assignments
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <span class="font-medium text-slate-900 dark:text-white" aria-current="page">
-      {% if is_create %}New Assignment{% else %}Edit Assignment{% endif %}
-    </span>
-  </nav>
+{% block breadcrumb %}
+<nav class="sp-crumbs" aria-label="Breadcrumb">
+  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
+  <span aria-hidden="true">&rsaquo;</span>
+  <a href="{% url 'dashboard:teacher_courses' %}">Courses</a>
+  <span aria-hidden="true">&rsaquo;</span>
+  <a href="{% url 'dashboard:teacher_assignments' course.slug %}">{{ course.title }} Assignments</a>
+  <span aria-hidden="true">&rsaquo;</span>
+  <span aria-current="page">{% if is_create %}New Assignment{% else %}Edit Assignment{% endif %}</span>
+</nav>
+{% endblock %}
 
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight font-display">
-        {% if is_create %}Create Assignment in {{ course.title }}{% else %}Edit Assignment: {{ assignment.title }}{% endif %}
-      </h1>
-      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-        Configure title, associated lesson, instructions, deadlines, and maximum score.
-      </p>
-    </div>
-  </div>
+{% block page_title %}{% if is_create %}Create Assignment in {{ course.title }}{% else %}Edit Assignment: {{ assignment.title }}{% endif %}{% endblock %}
+{% block page_subtitle %}Configure title, associated lesson, instructions, deadlines, and maximum score.{% endblock %}
 
-  <!-- Form Card -->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs max-w-3xl">
-    <form id="assignment-form" method="post" action="" novalidate class="space-y-6" data-originally-published="{% if assignment and assignment.is_published %}true{% else %}false{% endif %}" data-submission-count="{{ submission_count|default:'0' }}">
+{% block content %}
+<div class="sp-stack sp-max">
+  <div class="sp-card sp-pad">
+    <form
+      id="assignment-form"
+      method="post"
+      action=""
+      novalidate
+      data-originally-published="{% if assignment and assignment.is_published %}true{% else %}false{% endif %}"
+      data-submission-count="{{ submission_count|default:'0' }}"
+    >
       {% csrf_token %}
+      {{ form.confirm_unpublish }}
 
       {% if form.non_field_errors %}
-        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-xs font-semibold text-rose-800 dark:text-rose-300">
-          {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
+        <div class="sp-banner sp-banner--err" role="alert">
+          <div class="sp-banner-main">
+            <span class="sp-order" aria-hidden="true">
+              <svg class="sp-i sp-i--sm"><use href="#i-help"/></svg>
+            </span>
+            <div>
+              {% for error in form.non_field_errors %}
+                <p class="sp-error">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
         </div>
       {% endif %}
 
-      <!-- Hidden confirm_unpublish field -->
-      {{ form.confirm_unpublish }}
+      {% include "teacher/partials/_field.html" with field=form.title %}
+      {% include "teacher/partials/_field.html" with field=form.lesson %}
+      {% include "teacher/partials/_field.html" with field=form.instructions %}
 
-      <!-- Title Field -->
-      <div>
-        <label for="{{ form.title.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-          Assignment Title <span class="text-rose-500">*</span>
-        </label>
-        {{ form.title }}
-        {% if form.title.errors %}
-          <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.title.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <div class="sp-form-section sp-field">
+        <h2>Submission Window &amp; Deadlines (Kathmandu Time)</h2>
 
-      <!-- Associated Lesson (Requirement 8: restricted to this course) -->
-      <div>
-        <label for="{{ form.lesson.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-          Attach to Syllabus Lesson (Optional)
-        </label>
-        {{ form.lesson }}
-        {% if form.lesson.help_text %}
-          <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{{ form.lesson.help_text }}</p>
-        {% endif %}
-        {% if form.lesson.errors %}
-          <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.lesson.errors.0 }}</p>
-        {% endif %}
-      </div>
-
-      <!-- Instructions Field -->
-      <div>
-        <label for="{{ form.instructions.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-          Instructions & Problem Prompt <span class="text-rose-500">*</span>
-        </label>
-        {{ form.instructions }}
-        {% if form.instructions.help_text %}
-          <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{{ form.instructions.help_text }}</p>
-        {% endif %}
-        {% if form.instructions.errors %}
-          <p class="mt-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.instructions.errors.0 }}</p>
-        {% endif %}
-      </div>
-
-      <!-- Deadlines Section (Requirement 14) -->
-      <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-          Submission Window & Deadlines (Kathmandu Time)
-        </h3>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Opens At -->
-          <div>
-            <label for="{{ form.opens_at.id_for_label }}" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-              Opens At <span class="text-rose-500">*</span>
-            </label>
-            {{ form.opens_at }}
-            {% if form.opens_at.errors %}
-              <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.opens_at.errors.0 }}</p>
-            {% endif %}
-          </div>
-
-          <!-- Due At -->
-          <div>
-            <label for="{{ form.due_at.id_for_label }}" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-              Due Date & Time <span class="text-rose-500">*</span>
-            </label>
-            {{ form.due_at }}
-            {% if form.due_at.errors %}
-              <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.due_at.errors.0 }}</p>
-            {% endif %}
-          </div>
+        <div class="sp-form-grid">
+          {% include "teacher/partials/_field.html" with field=form.opens_at %}
+          {% include "teacher/partials/_field.html" with field=form.due_at %}
         </div>
 
-        <!-- Confirm Past Deadline Checkbox (Requirement 14) -->
-        <div id="past-deadline-box" class="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-start gap-3">
+        <div id="past-deadline-box" class="sp-check sp-mt">
           {{ form.confirm_past_deadline }}
           <div>
-            <label for="{{ form.confirm_past_deadline.id_for_label }}" class="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+            <label for="{{ form.confirm_past_deadline.id_for_label }}">
               I confirm setting or keeping this due date in the past
             </label>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+            <p class="sp-help">
               Required if the deadline is already passed, which prevents new student submissions.
             </p>
-            {% if form.confirm_past_deadline.errors %}
-              <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.confirm_past_deadline.errors.0 }}</p>
-            {% endif %}
+            {% for e in form.confirm_past_deadline.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
           </div>
         </div>
       </div>
 
-      <!-- Max Score & Scoring (Requirement 14) -->
-      <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-          Grading Scale
-        </h3>
+      <div class="sp-form-section sp-field">
+        <h2>Grading Scale</h2>
 
-        <div class="max-w-xs">
-          <label for="{{ form.max_score.id_for_label }}" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-            Maximum Score <span class="text-rose-500">*</span>
-          </label>
-          {{ form.max_score }}
-          {% if form.max_score.errors %}
-            <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.max_score.errors.0 }}</p>
-          {% endif %}
+        <div class="sp-w-sm">
+          {% include "teacher/partials/_field.html" with field=form.max_score %}
         </div>
 
         {% if assignment and assignment.submissions.exists %}
-          <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-            <strong>Grading Notice:</strong> This assignment has existing student submissions. Max score cannot be lowered below any awarded grade, and changing max score will re-scale existing student percentage calculations.
+          <div class="sp-banner">
+            <div class="sp-banner-main">
+              <span class="sp-order" aria-hidden="true">
+                <svg class="sp-i sp-i--sm"><use href="#i-help"/></svg>
+              </span>
+              <p class="sp-banner-text">
+                <strong>Grading Notice:</strong> This assignment has existing student submissions.
+                Max score cannot be lowered below any awarded grade, and changing max score will re-scale
+                existing student percentage calculations.
+              </p>
+            </div>
           </div>
         {% endif %}
       </div>
 
-      <!-- Publishing Section (Requirement 1) -->
-      <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-          Publishing Status
-        </h3>
-
-        <div class="flex items-start gap-3">
+      <div class="sp-form-section sp-field">
+        <h2>Publishing Status</h2>
+        <div class="sp-check">
           {{ form.is_published }}
           <div>
-            <label for="{{ form.is_published.id_for_label }}" class="text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-              Publish Assignment
-            </label>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Draft assignments (unchecked) are completely hidden from all student views, submission endpoints, and course score calculations.
+            <label for="{{ form.is_published.id_for_label }}">Publish Assignment</label>
+            <p class="sp-help">
+              Draft assignments (unchecked) are completely hidden from all student views,
+              submission endpoints, and course score calculations.
             </p>
-            {% if form.is_published.errors %}
-              <p class="mt-1 text-xs font-semibold text-rose-600 dark:text-rose-400">{{ form.is_published.errors.0 }}</p>
-            {% endif %}
+            {% for e in form.is_published.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
           </div>
         </div>
       </div>
 
-      <!-- Form Actions -->
-      <div class="pt-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
-        <a
-          href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}"
-          class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-        >
+      <div class="sp-form-actions">
+        <a href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}" class="sp-btn sp-btn--secondary">
           Cancel
         </a>
-        <button
-          type="submit"
-          class="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 min-h-[44px]"
-        >
+        <button type="submit" class="sp-btn">
           {% if is_create %}Create Assignment{% else %}Save Changes{% endif %}
         </button>
       </div>
@@ -207,252 +123,247 @@
   </div>
 
   {% if not is_create %}
-  <!-- Attachments Panel (Handouts, Rubrics, Starter Files) -->
-  <div class="mt-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs max-w-3xl">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-      <div>
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">
-          Attachments & Starter Files ({{ attachments|length }})
-        </h2>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Attach project starter files, assignment handouts, lab sheets, or rubrics.
-        </p>
+    <div class="sp-card">
+      <div class="sp-row-head">
+        <div class="sp-row-head-main">
+          <h2 class="sp-section-title sp-flush">Attachments &amp; Starter Files</h2>
+          <span class="sp-badge">{{ attachments|length }}</span>
+          <p class="sp-row-head-meta sp-note">
+            Attach project starter files, assignment handouts, lab sheets, or rubrics.
+          </p>
+        </div>
+        <button type="button" id="toggle-add-attachment-btn" class="sp-btn sp-btn--secondary sp-btn--sm">
+          <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-plus"/></svg>
+          <span>Add Attachment</span>
+        </button>
       </div>
-      <button
-        type="button"
-        id="toggle-add-attachment-btn"
-        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition cursor-pointer"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Add Attachment
-      </button>
-    </div>
 
-    <!-- Add Attachment Form -->
-    <div id="add-attachment-panel" class="mb-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 {% if not attachment_form.errors %}hidden{% endif %}">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-3">
-        Upload New Attachment
-      </h3>
-      <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_add' slug=course.slug assignment_id=assignment.id %}" enctype="multipart/form-data" class="space-y-4">
-        {% csrf_token %}
-        <div>
-          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-            Title <span class="text-rose-500">*</span>
-          </label>
-          {{ attachment_form.title }}
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-            File <span class="text-rose-500">*</span>
-          </label>
-          {{ attachment_form.file }}
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">PDF, Office (DOCX, PPTX, XLSX), plain text, or images (PNG, JPG) up to 25 MB.</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Download Policy
-            </label>
-            {{ attachment_form.download_policy }}
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">View-only is strictly for PDF and images.</p>
-          </div>
-          <div class="flex items-center pt-4">
-            <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-700 dark:text-slate-300">
-              {{ attachment_form.is_published }}
-              <span>Publish attachment immediately</span>
-            </label>
-          </div>
-        </div>
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button
-            type="button"
-            id="cancel-add-attachment-btn"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="px-4 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs"
-          >
-            Upload Attachment
-          </button>
-        </div>
-      </form>
-    </div>
+      <div class="sp-pad">
+        <div id="add-attachment-panel" class="sp-form-section {% if not attachment_form.errors %}hidden{% endif %}">
+          <h2>Upload New Attachment</h2>
 
-    <!-- Attachments Table -->
-    {% if attachments %}
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-          <thead class="bg-slate-50 dark:bg-slate-800/60 text-xs uppercase font-bold text-slate-500 dark:text-slate-400">
-            <tr>
-              <th scope="col" class="px-3 py-2.5 rounded-l-lg">Order</th>
-              <th scope="col" class="px-3 py-2.5">Attachment</th>
-              <th scope="col" class="px-3 py-2.5">Policy</th>
-              <th scope="col" class="px-3 py-2.5">Status</th>
-              <th scope="col" class="px-3 py-2.5">Downloads</th>
-              <th scope="col" class="px-3 py-2.5 rounded-r-lg text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-            {% for att in attachments %}
-              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition">
-                <td class="px-3 py-3 text-xs text-slate-400 font-mono">
-                  <div class="flex items-center gap-1">
-                    <span>#{{ att.order }}</span>
-                    <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_reorder' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}" class="inline">
-                      {% csrf_token %}
-                      <input type="hidden" name="direction" value="up">
-                      <button type="submit" class="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer" title="Move Up">▲</button>
-                    </form>
-                    <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_reorder' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}" class="inline">
-                      {% csrf_token %}
-                      <input type="hidden" name="direction" value="down">
-                      <button type="submit" class="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer" title="Move Down">▼</button>
-                    </form>
-                  </div>
-                </td>
-                <td class="px-3 py-3">
-                  <div class="font-semibold text-slate-900 dark:text-white text-xs sm:text-sm">
-                    {{ att.title }}
-                  </div>
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
-                    <span>{{ att.original_filename|default:"file" }}</span>
-                    {% if att.file_size %}
-                      <span>&bull; {{ att.file_size|filesizeformat }}</span>
+          {% if attachment_form.non_field_errors %}
+            <div class="sp-error" role="alert">
+              {% for error in attachment_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+
+          <form
+            method="post"
+            action="{% url 'dashboard:teacher_assignment_attachment_add' slug=course.slug assignment_id=assignment.id %}"
+            enctype="multipart/form-data"
+          >
+            {% csrf_token %}
+
+            {% include "teacher/partials/_field.html" with field=attachment_form.title %}
+            {% include "teacher/partials/_field.html" with field=attachment_form.file %}
+
+            <div class="sp-form-grid">
+              <div>
+                {% include "teacher/partials/_field.html" with field=attachment_form.download_policy %}
+                <p class="sp-help">View-only is strictly for PDF and images.</p>
+              </div>
+              <div class="sp-field">
+                <div class="sp-check">
+                  {{ attachment_form.is_published }}
+                  <div>
+                    <label for="{{ attachment_form.is_published.id_for_label }}">Publish attachment immediately</label>
+                    {% if attachment_form.is_published.help_text %}
+                      <p class="sp-help">{{ attachment_form.is_published.help_text }}</p>
                     {% endif %}
+                    {% for e in attachment_form.is_published.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
                   </div>
-                </td>
-                <td class="px-3 py-3 text-xs">
-                  {% if att.download_policy == 'view_only' %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                      View Only
-                    </span>
-                  {% else %}
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      Downloadable
-                    </span>
-                  {% endif %}
-                </td>
-                <td class="px-3 py-3 text-xs">
-                  <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_toggle_publish' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}" class="inline">
-                    {% csrf_token %}
-                    <button type="submit" class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium {% if att.is_published %}bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800{% else %}bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700{% endif %} hover:opacity-80 cursor-pointer">
-                      {% if att.is_published %}Published{% else %}Hidden{% endif %}
-                    </button>
-                  </form>
-                </td>
-                <td class="px-3 py-3 text-xs">
-                  <a
-                    href="{% url 'dashboard:teacher_assignment_attachment_downloads' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}"
-                    class="font-medium text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>{{ att.download_count|default:"0" }}</span>
-                    <span class="text-[11px] text-slate-400">downloads</span>
-                  </a>
-                </td>
-                <td class="px-3 py-3 text-right text-xs">
-                  <div class="flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold edit-attachment-toggle cursor-pointer"
-                      data-target="edit-att-{{ att.id }}"
-                    >
-                      Edit
-                    </button>
-                    <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_delete' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}" class="inline delete-attachment-form">
+                </div>
+              </div>
+            </div>
+
+            <div class="sp-form-actions">
+              <button type="button" id="cancel-add-attachment-btn" class="sp-btn sp-btn--secondary sp-btn--sm">
+                Cancel
+              </button>
+              <button type="submit" class="sp-btn sp-btn--sm">Upload Attachment</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {% if attachments %}
+        <div class="sp-table-wrap">
+          <table class="sp-table">
+            <thead>
+              <tr>
+                <th scope="col">Order</th>
+                <th scope="col">Attachment</th>
+                <th scope="col">Policy</th>
+                <th scope="col">Status</th>
+                <th scope="col">Downloads</th>
+                <th scope="col" class="sp-text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for att in attachments %}
+                <tr>
+                  <td>
+                    <div class="sp-order-group">
+                      <span class="sp-order">#{{ att.order }}</span>
+                      <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_reorder' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="direction" value="up">
+                        <button type="submit" class="sp-icon-btn" title="Move Up" aria-label="Move {{ att.title }} up">
+                          <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-arrow-up"/></svg>
+                        </button>
+                      </form>
+                      <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_reorder' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="direction" value="down">
+                        <button type="submit" class="sp-icon-btn" title="Move Down" aria-label="Move {{ att.title }} down">
+                          <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-arrow-down"/></svg>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                  <td>
+                    <b>{{ att.title }}</b>
+                    <p class="sp-note">
+                      <span>{{ att.original_filename|default:"file" }}</span>
+                      {% if att.file_size %}
+                        <span>&bull; {{ att.file_size|filesizeformat }}</span>
+                      {% endif %}
+                    </p>
+                  </td>
+                  <td>
+                    {% if att.download_policy == 'view_only' %}
+                      <span class="sp-badge sp-badge--warn">View Only</span>
+                    {% else %}
+                      <span class="sp-badge sp-badge--ok">Downloadable</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_toggle_publish' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}">
                       {% csrf_token %}
-                      <button type="submit" class="text-rose-600 dark:text-rose-400 hover:underline font-semibold cursor-pointer">
-                        Delete
+                      <button type="submit" class="sp-btn sp-btn--secondary sp-btn--sm">
+                        {% if att.is_published %}
+                          <span class="sp-ok-text">Published</span>
+                        {% else %}
+                          <span class="sp-note">Hidden</span>
+                        {% endif %}
                       </button>
                     </form>
-                  </div>
-                </td>
-              </tr>
-              <!-- Inline Edit Row -->
-              <tr id="edit-att-{{ att.id }}" class="hidden bg-slate-50/70 dark:bg-slate-800/40">
-                <td colspan="6" class="p-4">
-                  <form method="post" action="{% url 'dashboard:teacher_assignment_attachment_edit' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}" enctype="multipart/form-data" class="space-y-3">
-                    {% csrf_token %}
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label class="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Title</label>
-                        <input type="text" name="title" value="{{ att.title }}" required class="w-full text-xs rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-slate-900 dark:text-white">
-                      </div>
-                      <div>
-                        <label class="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Download Policy</label>
-                        <select name="download_policy" class="w-full text-xs rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-slate-900 dark:text-white">
-                          <option value="open_to_enrolled" {% if att.download_policy == 'open_to_enrolled' %}selected{% endif %}>Downloadable</option>
-                          <option value="view_only" {% if att.download_policy == 'view_only' %}selected{% endif %}>View Only (PDF/Images only)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-[11px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Replace File (Optional)</label>
-                        <input type="file" name="file" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-slate-100 dark:file:bg-slate-800 file:text-slate-700 dark:file:text-slate-300">
-                      </div>
+                  </td>
+                  <td>
+                    <a href="{% url 'dashboard:teacher_assignment_attachment_downloads' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}" class="sp-link">
+                      {{ att.download_count|default:"0" }}
+                    </a>
+                    <span class="sp-note">downloads</span>
+                  </td>
+                  <td>
+                    <div class="sp-actions">
+                      <button
+                        type="button"
+                        class="sp-link sp-linkbtn edit-attachment-toggle"
+                        data-target="edit-att-{{ att.id }}"
+                      >
+                        Edit
+                      </button>
+                      <form
+                        method="post"
+                        action="{% url 'dashboard:teacher_assignment_attachment_delete' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}"
+                        data-sp-confirm="Delete or hide &quot;{{ att.title }}&quot;?"
+                        data-sp-confirm-label="Delete"
+                      >
+                        {% csrf_token %}
+                        <button type="submit" class="sp-btn sp-btn--danger-outline sp-btn--sm">Delete</button>
+                      </form>
                     </div>
-                    <div class="flex items-center justify-end gap-2 pt-2">
-                      <button type="button" class="px-3 py-1 text-xs rounded border border-slate-300 dark:border-slate-700 cancel-edit-att cursor-pointer" data-target="edit-att-{{ att.id }}">Cancel</button>
-                      <button type="submit" class="px-4 py-1 text-xs rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 cursor-pointer">Save Attachment</button>
-                    </div>
-                  </form>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <div class="text-center py-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-        <p class="text-xs text-slate-500 dark:text-slate-400">No attachments uploaded for this assignment yet.</p>
-      </div>
-    {% endif %}
-  </div>
+                  </td>
+                </tr>
+                <tr id="edit-att-{{ att.id }}" class="hidden sp-edit-row">
+                  <td colspan="6">
+                    <form
+                      method="post"
+                      action="{% url 'dashboard:teacher_assignment_attachment_edit' slug=course.slug assignment_id=assignment.id attachment_id=att.id %}"
+                      enctype="multipart/form-data"
+                    >
+                      {% csrf_token %}
+                      <div class="sp-form-grid">
+                        <div class="sp-field">
+                          <label for="edit-title-{{ att.id }}">Title</label>
+                          <input
+                            id="edit-title-{{ att.id }}"
+                            type="text"
+                            name="title"
+                            value="{{ att.title }}"
+                            required
+                            class="sp-input"
+                          >
+                        </div>
+                        <div class="sp-field">
+                          <label for="edit-policy-{{ att.id }}">Download Policy</label>
+                          <select id="edit-policy-{{ att.id }}" name="download_policy" class="sp-input">
+                            <option value="open_to_enrolled" {% if att.download_policy == 'open_to_enrolled' %}selected{% endif %}>Downloadable</option>
+                            <option value="view_only" {% if att.download_policy == 'view_only' %}selected{% endif %}>View Only (PDF/Images only)</option>
+                          </select>
+                        </div>
+                        <div class="sp-field">
+                          <label for="edit-file-{{ att.id }}">Replace File (Optional)</label>
+                          <input id="edit-file-{{ att.id }}" type="file" name="file" class="sp-input">
+                        </div>
+                      </div>
+                      <div class="sp-form-actions">
+                        <button
+                          type="button"
+                          class="sp-btn sp-btn--secondary sp-btn--sm cancel-edit-att"
+                          data-target="edit-att-{{ att.id }}"
+                        >
+                          Cancel
+                        </button>
+                        <button type="submit" class="sp-btn sp-btn--sm">Save Attachment</button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="sp-empty">
+          <span class="sp-empty-icon" aria-hidden="true">
+            <svg class="sp-i"><use href="#i-file"/></svg>
+          </span>
+          <b>No attachments uploaded</b>
+          <p>Add starter files, handouts, lab sheets, or rubrics for this assignment.</p>
+        </div>
+      {% endif %}
+    </div>
   {% endif %}
 </div>
 
-<!-- Unpublish Confirmation Modal (Requirement 3) -->
-<div
-  id="unpublish-modal"
-  class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="unpublish-modal-title"
->
-  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full p-6">
-    <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+<div id="unpublish-modal" class="sp-modal hidden" role="dialog" aria-modal="true" aria-labelledby="unpublish-modal-title">
+  <div class="sp-dialog">
+    <div class="sp-dialog-head">
+      <h2 id="unpublish-modal-title">Confirm Unpublishing Assignment</h2>
+      <span class="sp-order" aria-hidden="true">
+        <svg class="sp-i sp-i--sm"><use href="#i-help"/></svg>
+      </span>
     </div>
-    <h3 id="unpublish-modal-title" class="text-lg font-bold text-slate-900 dark:text-white mb-2">
-      Confirm Unpublishing Assignment
-    </h3>
-    <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-      This assignment currently has <strong class="text-slate-900 dark:text-white">{{ submission_count|default:"0" }}</strong> student submission(s).
+    <p class="sp-note">
+      This assignment currently has <strong>{{ submission_count|default:"0" }}</strong> student submission(s).
       Unpublishing will immediately hide these grades, feedback, and assignment details from students.
     </p>
 
-    <div class="flex items-center justify-end gap-3">
-      <button
-        type="button"
-        id="unpublish-modal-cancel"
-        class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-      >
+    <div class="sp-actions">
+      <button type="button" id="unpublish-modal-cancel" class="sp-btn sp-btn--secondary">
         Keep Published
       </button>
-      <button
-        type="button"
-        id="unpublish-modal-confirm"
-        class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-xs transition"
-      >
+      <button type="button" id="unpublish-modal-confirm" class="sp-btn sp-btn--danger">
         Confirm Unpublish
       </button>
     </div>
   </div>
 </div>
+{% endblock %}
 
-{% endblock dashboard_content %}
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}" defer></script>
+{% endblock %}

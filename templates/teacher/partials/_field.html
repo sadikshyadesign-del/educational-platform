@@ -1,7 +1,8 @@
 {# {% include "teacher/partials/_field.html" with field=form.title %}  : renders label + your normal widget + help + errors #}
+{# Optional: label="Custom Label" help="Custom help text" #}
 <div class="sp-field{% if field.errors %} sp-field--err{% endif %}">
-  <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>
+  <label for="{{ field.id_for_label }}">{% if label %}{{ label }}{% else %}{{ field.label }}{% endif %}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>
   {{ field }}
-  {% if field.help_text %}<p class="sp-help">{{ field.help_text }}</p>{% endif %}
+  {% if help %}<p class="sp-help">{{ help }}</p>{% elif field.help_text %}<p class="sp-help">{{ field.help_text }}</p>{% endif %}
   {% for e in field.errors %}<p class="sp-error" role="alert">{{ e }}</p>{% endfor %}
 </div>
