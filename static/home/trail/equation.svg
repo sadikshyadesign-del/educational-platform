@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="200" viewBox="0 0 160 200">
+  <rect width="160" height="200" rx="2" fill="#f4f0e8"/>
+  <rect x="10" y="10" width="140" height="180" fill="none" stroke="#e8e5de"/>
+  <path d="M27 43h70M27 92h106M27 137h84" stroke="#d0b582" stroke-width="1"/>
+  <text x="27" y="38" fill="#17263d" font-family="Georgia,serif" font-size="17">a² + b² = c²</text>
+  <text x="27" y="83" fill="#17263d" font-family="Georgia,serif" font-size="19">∫ x dx = x²/2</text>
+  <text x="27" y="127" fill="#17263d" font-family="Georgia,serif" font-size="16">f(x) = mx + c</text>
+  <text x="27" y="165" fill="#8a6532" font-family="Georgia,serif" font-size="15">Q.E.D.</text>
+</svg>

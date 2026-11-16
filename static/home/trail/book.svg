@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="200" viewBox="0 0 160 200">
+  <rect width="160" height="200" rx="2" fill="#f4f0e8"/>
+  <rect x="10" y="10" width="140" height="180" fill="none" stroke="#e8e5de"/>
+  <path d="M30 46c20-8 39-5 50 4v93c-12-10-30-13-50-5zM130 46c-20-8-39-5-50 4v93c12-10 30-13 50-5z" fill="#fff" stroke="#17263d" stroke-width="1.5"/>
+  <path d="M40 65c12-4 23-3 31 1M40 78c12-4 23-3 31 1M40 91c12-4 23-3 31 1M120 65c-12-4-23-3-31 1M120 78c-12-4-23-3-31 1M120 91c-12-4-23-3-31 1" stroke="#d0b582" stroke-width="1.4"/>
+  <path d="M80 50v93" stroke="#8a6532" stroke-width="1.5"/>
+  <text x="48" y="165" fill="#17263d" font-family="Georgia,serif" font-size="13">MATHEMATICS</text>
+</svg>

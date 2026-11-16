@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.db import connection
 from django.db.models import Count, Q
@@ -15,8 +16,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from apps.core.constants import FAQ_CACHE_KEY
-from apps.core.models import FAQItem, SiteSettings
-from apps.core.utils import serialize_json_ld
+from apps.core.models import FAQItem
 from apps.courses.models import Course
 
 logger = logging.getLogger(__name__)
@@ -26,10 +26,8 @@ logger = logging.getLogger(__name__)
 def home_view(request):
     """
     Public home landing page.
-    Renders hero, available courses grid, instructor bio (if filled), how it works, and FAQs.
+    Renders the public homepage with featured courses, sample resources, and FAQs.
     """
-    site_settings = SiteSettings.get_solo()
-
     featured_courses = (
         Course.objects.filter(is_published=True, is_archived=False)
         .annotate(
@@ -37,29 +35,83 @@ def home_view(request):
         )
         .order_by("-is_featured", "-created_at")[:6]
     )
-
     faqs = cache.get(FAQ_CACHE_KEY)
     if faqs is None:
         faqs = list(FAQItem.objects.filter(is_published=True).order_by("order", "id"))
         cache.set(FAQ_CACHE_KEY, faqs, timeout=3600)
 
-    # Generate EducationalOrganization Schema.org JSON-LD
-    org_schema = {
-        "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "name": site_settings.site_name,
-        "url": settings.SITE_URL,
-        "description": site_settings.hero_subheadline,
-    }
-    if site_settings.contact_email:
-        org_schema["email"] = site_settings.contact_email
-
-    json_ld_raw = serialize_json_ld(org_schema)
+    # TODO: Replace these editorial sample cards with categorized resource records.
+    resources = [
+        {
+            "title": "SEE Model Questions — Worked Solutions",
+            "description": "Step-by-step solutions to a full model question set for final preparation.",
+            "category": "Worked Solutions",
+            "icon": "pencil",
+            "access": "request",
+            "grade": "Grade 10",
+            "topic": "Revision",
+            "date": "22 Oct 2026",
+        },
+        {
+            "title": "Integration — Assignment 2",
+            "description": "Substitution and integration by parts with graded conceptual challenges.",
+            "category": "Assignments",
+            "icon": "clipboard-text",
+            "access": "request",
+            "grade": "Grade 12",
+            "topic": "Calculus",
+            "date": "21 Oct 2026",
+        },
+        {
+            "title": "Compound Interest — Assignment 1",
+            "description": "Four problems on yearly and half-yearly compounding. Show every step.",
+            "category": "Assignments",
+            "icon": "clipboard-text",
+            "access": "free",
+            "grade": "Grade 10",
+            "topic": "Compound Interest",
+            "date": "20 Oct 2026",
+        },
+        {
+            "title": "Mock Test 1 — Mathematics Section",
+            "description": "A timed practice paper complete with full answer key and rubric explanations.",
+            "category": "Practice Questions",
+            "icon": "list-check",
+            "access": "request",
+            "grade": "Grade 10",
+            "topic": "Mock Exam",
+            "date": "19 Oct 2026",
+        },
+        {
+            "title": "Algebraic Expressions — Assignment 1",
+            "description": "Factorisation, polynomial division, and algebraic identity mastery questions.",
+            "category": "Assignments",
+            "icon": "clipboard-text",
+            "access": "free",
+            "grade": "Grade 9",
+            "topic": "Algebra",
+            "date": "18 Oct 2026",
+        },
+        {
+            "title": "Limits and Continuity — Practice",
+            "description": "Standard limit evaluations, L'Hôpital's introductory techniques and continuity proofs.",
+            "category": "Practice Questions",
+            "icon": "list-check",
+            "access": "free",
+            "grade": "Grade 11",
+            "topic": "Limits",
+            "date": "16 Oct 2026",
+        },
+    ]
 
     context = {
         "featured_courses": featured_courses,
         "faqs": faqs,
-        "json_ld_raw": json_ld_raw,
+        "resources": resources,
+        "hero_webp_available": bool(finders.find("home/images/hero.webp")),
+        "hero_jpg_available": bool(finders.find("home/images/hero.jpg")),
+        "footer_image_available": bool(finders.find("home/images/footer.webp")),
+        "footer_jpg_available": bool(finders.find("home/images/footer.jpg")),
     }
     return render(request, "core/home.html", context)
 
@@ -90,6 +142,12 @@ def privacy_view(request):
 def terms_view(request):
     """Static Terms of Service page."""
     return render(request, "core/terms.html")
+
+
+@require_http_methods(["GET"])
+def coming_soon_view(request):
+    """Simple destination for homepage links whose full pages are not implemented yet."""
+    return render(request, "core/coming_soon.html")
 
 
 @require_http_methods(["GET"])

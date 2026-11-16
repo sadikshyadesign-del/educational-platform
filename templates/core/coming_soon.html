@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Coming soon — {{ site_settings.site_name }}{% endblock title %}
+{% block meta_description %}This learning page is coming soon.{% endblock meta_description %}
+
+{% block content %}
+  <section class="mx-auto flex min-h-[55vh] max-w-3xl flex-col items-center justify-center px-6 py-20 text-center" aria-labelledby="coming-soon-heading">
+    <p class="eyebrow">A little more time</p>
+    <h1 id="coming-soon-heading" class="section-title">Coming soon.</h1>
+    <p class="mt-5 max-w-xl text-base leading-relaxed text-slate-600">This learning page is being prepared. In the meantime, explore the available mathematics courses.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <a class="btn-primary min-h-[44px]" href="{% url 'courses:list' %}">Browse courses</a>
+      <a class="btn-outline min-h-[44px]" href="{% url 'core:home' %}">Back to home</a>
+    </div>
+  </section>
+{% endblock content %}

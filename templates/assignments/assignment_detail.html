@@ -5,7 +5,7 @@
 {% block meta_description %}Assignment details and submission for {{ assignment.title }}.{% endblock %}
 
 {% block content %}
-<div class="student-page max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-server-time="{{ server_time_iso }}">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-server-time="{{ server_time_iso }}">
   <!-- Breadcrumb Navigation -->
   <nav aria-label="Breadcrumb" class="mb-6 flex items-center text-xs sm:text-sm text-gray-500 dark:text-gray-400 gap-2 flex-wrap">
     <a href="{% url 'dashboard:student' %}" class="hover:text-gray-900 dark:hover:text-white transition">Dashboard</a>
