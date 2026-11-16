@@ -1,0 +1,15 @@
+{# include with: icon (check|pencil|target), kind_label, access ("free" or "request"), title, text, grade, topic, date, href #}
+<article class="hp-card">
+  <div>
+    <div class="hp-card-top">
+      <span class="hp-kind"><svg class="hp-i" aria-hidden="true"><use href="#hp-{{ icon|default:'pencil' }}"/></svg>{{ kind_label }}</span>
+      {% if access == "free" %}<span class="hp-pill hp-pill--free">Free</span>{% else %}<span class="hp-pill"><svg class="hp-i hp-i--sm" aria-hidden="true"><use href="#hp-lock"/></svg>Request access</span>{% endif %}
+    </div>
+    <h3 class="hp-card-title">{{ title }}</h3>
+    <p class="hp-card-text">{{ text }}</p>
+  </div>
+  <div class="hp-card-foot">
+    <p class="hp-card-meta"><b>{{ grade }}</b><span>{{ topic }}</span><span>{{ date }}</span></p>
+    <a class="hp-open" href="{{ href|default:'#' }}" aria-label="Open {{ title }}"><svg class="hp-i" aria-hidden="true"><use href="#hp-arrow-ur"/></svg></a>
+  </div>
+</article>

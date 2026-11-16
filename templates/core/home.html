@@ -13,64 +13,14 @@
 {% block theme_controller %}{% endblock theme_controller %}
 
 {% block extra_head %}
-  <link rel="preload" href="{% static 'fonts/bodoni-moda-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap">
   <link rel="stylesheet" href="{% static 'home/home-figma.css' %}">
 {% endblock extra_head %}
 
 {% block site_header %}
-  <header id="hp-header" class="hp-header" aria-label="Site header">
-    <div class="hp-wrap hp-bar">
-      <a class="hp-logo" href="{% url 'core:home' %}">{{ site_settings.site_name|default:"Suren" }}</a>
-      <nav id="hp-navigation" class="hp-nav" aria-label="Main navigation">
-        <a href="{% url 'core:home' %}" aria-current="page">Home</a>
-        <a href="#about">About</a>
-        <a href="{% url 'courses:list' %}">Maths</a>
-        <a href="#contact">Contact</a>
-        <a href="{% url 'core:coming_soon' %}">Resources</a>
-        {% if user.is_authenticated %}
-          {% if user.is_teacher or user.is_staff %}
-            <a class="hp-mobile-auth" href="{% url 'dashboard:teacher' %}">Teacher Dashboard</a>
-          {% else %}
-            <a class="hp-mobile-auth" href="{% url 'dashboard:student' %}">My Dashboard</a>
-          {% endif %}
-          <form class="hp-mobile-auth" method="post" action="{% url 'account_logout' %}">
-            {% csrf_token %}
-            <button type="submit">Sign out</button>
-          </form>
-        {% else %}
-          <a class="hp-mobile-auth" href="{% url 'account_login' %}">Student Login</a>
-        {% endif %}
-      </nav>
-      <div class="hp-header-actions">
-        {% if user.is_authenticated %}
-          {% if user.is_teacher or user.is_staff %}
-            <a class="hp-login" href="{% url 'dashboard:teacher' %}">Teacher Dashboard</a>
-          {% else %}
-            <a class="hp-login" href="{% url 'dashboard:student' %}">My Dashboard</a>
-          {% endif %}
-          <form class="hp-signout" method="post" action="{% url 'account_logout' %}">
-            {% csrf_token %}
-            <button type="submit">Sign out</button>
-          </form>
-        {% else %}
-          <a class="hp-login" href="{% url 'account_login' %}">Student Login</a>
-        {% endif %}
-      </div>
-      <button class="hp-burger" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="hp-navigation" id="hp-burger">
-        <svg class="hp-i" aria-hidden="true"><use href="#hp-menu"/></svg>
-      </button>
-    </div>
-    <svg class="hp-icons" aria-hidden="true" focusable="false">
-      <symbol id="hp-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
-      <symbol id="hp-arrow-d" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
-      <symbol id="hp-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
-      <symbol id="hp-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
-      <symbol id="hp-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
-      <symbol id="hp-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
-      <symbol id="hp-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
-      <symbol id="hp-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
-    </svg>
-  </header>
+  {% include "core/partials/_site_header.html" with current_page="home" %}
 {% endblock site_header %}
 
 {% block content %}
@@ -264,54 +214,7 @@
 {% endblock content %}
 
 {% block site_footer %}
-  <footer class="hp-footer" id="contact">
-    {% if footer_image_available %}
-      <img class="hp-footer-bg" src="{% static 'home/images/footer.webp' %}" alt="" aria-hidden="true" loading="lazy" width="1601">
-    {% elif footer_jpg_available %}
-      <img class="hp-footer-bg" src="{% static 'home/images/footer.jpg' %}" alt="" aria-hidden="true" loading="lazy" width="1601">
-    {% endif %}
-    <div class="hp-wrap">
-      <div class="hp-cta">
-        <h2>Let's Make Mathematics Clearer.</h2>
-        <a href="{% if site_settings.contact_email %}mailto:{{ site_settings.contact_email }}{% else %}{% url 'core:coming_soon' %}{% endif %}">Contact <svg class="hp-i" aria-hidden="true"><use href="#hp-arrow-r"/></svg></a>
-      </div>
-      <div class="hp-fgrid">
-        <div class="hp-fbrand">
-          <b>{{ site_settings.site_name|default:"Suren" }}</b>
-          <p>Mathematics teacher helping students in Grades 9–12 build understanding and confidence.</p>
-        </div>
-        <div class="hp-fcols">
-          <div>
-            <h3>Mathematics</h3>
-            <ul>
-              <li><a href="{% url 'core:coming_soon' %}">Grade 9</a></li>
-              <li><a href="{% url 'core:coming_soon' %}">Grade 10</a></li>
-              <li><a href="{% url 'core:coming_soon' %}">Grade 11</a></li>
-              <li><a href="{% url 'core:coming_soon' %}">Grade 12</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3>Exam Preparation</h3>
-            <ul>
-              <li><a href="{% url 'core:coming_soon' %}">Loksewa</a></li>
-              <li><a href="{% url 'core:coming_soon' %}">Shikshak Sewa</a></li>
-              <li><a href="{% url 'core:coming_soon' %}">All resources</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3>Connect</h3>
-            <ul>
-              <li><a href="#about">About me</a></li>
-              <li><a href="{% if site_settings.contact_email %}mailto:{{ site_settings.contact_email }}{% else %}{% url 'core:coming_soon' %}{% endif %}">Contact</a></li>
-            </ul>
-            {% if site_settings.contact_email %}
-              <p class="hp-contact-email"><a href="mailto:{{ site_settings.contact_email }}">{{ site_settings.contact_email }}</a></p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+  {% include "core/partials/_site_footer.html" %}
 {% endblock site_footer %}
 
 {% block scripts %}

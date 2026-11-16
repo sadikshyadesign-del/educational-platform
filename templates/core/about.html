@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Suren Chhetri · Mathematics Educator{% endblock title %}
+{% block meta_description %}Meet Suren Chhetri, a mathematics educator teaching Grades 9–12. Learn about his teaching philosophy, classroom experience, and exam preparation support.{% endblock meta_description %}
+{% block og_title %}About Suren Chhetri · Mathematics Educator{% endblock og_title %}
+{% block og_description %}Meet Suren Chhetri, a mathematics educator teaching Grades 9–12, and learn about his approach to clear, confident problem-solving.{% endblock og_description %}
+{% block twitter_title %}About Suren Chhetri · Mathematics Educator{% endblock twitter_title %}
+{% block twitter_description %}Meet Suren Chhetri, a mathematics educator teaching Grades 9–12, and learn about his approach to clear, confident problem-solving.{% endblock twitter_description %}
+
+{% block html_class %}h-full{% endblock html_class %}
+{% block body_class %}hp{% endblock body_class %}
+{% block theme_controller %}{% endblock theme_controller %}
+
+{% block extra_head %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap">
+  <link rel="stylesheet" href="{% static 'home/home-figma.css' %}">
+{% endblock extra_head %}
+
+{% block site_header %}
+  {% include "core/partials/_site_header.html" with current_page="about" %}
+{% endblock site_header %}
+
+{% block content %}
+  <div class="hp-ab">
+    <section class="hp-ab-hero" aria-labelledby="about-heading">
+      <div class="hp-wrap hp-ab-hero-grid">
+        <div class="hp-ab-hero-copy">
+          <p class="hp-ab-eyebrow">01 / About the educator</p>
+          <h1 id="about-heading" class="hp-ab-title">Suren Chhetri</h1>
+          <!-- CONFIRM WITH SUREN SIR: current role as a Government High School mathematics teacher -->
+          <p class="hp-ab-role">Mathematics Educator · Government High School Teacher</p>
+          <blockquote class="hp-ab-quote">
+            “Teaching is more than explaining formulas. It is about helping students understand the logic behind them, develop confidence, and approach problems with clarity.”
+          </blockquote>
+        </div>
+        <div class="hp-ab-portrait">
+          <div class="hp-ab-frame" aria-hidden="true"></div>
+          {% if portrait_available %}
+            <img src="{% static 'site/img/suren-portrait.jpg' %}" alt="Portrait of Suren Chhetri, mathematics educator" width="454" height="682" fetchpriority="high">
+          {% else %}
+            <div class="hp-ab-portrait-fallback" role="img" aria-label="Portrait placeholder for Suren Chhetri">
+              <span aria-hidden="true">∑</span>
+              <small>Suren Chhetri<br>mathematics educator</small>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="hp-ab-section hp-ab-cream" aria-labelledby="philosophy-heading">
+      <div class="hp-wrap">
+        <p class="hp-ab-eyebrow hp-ab-eyebrow--dark">02 / Teaching philosophy</p>
+        <h2 id="philosophy-heading" class="hp-ab-h2">My teaching philosophy</h2>
+        <p class="hp-ab-intro">Mathematics becomes easier to trust when students can see how an idea works, practise it with guidance, and gradually rely on their own reasoning.</p>
+        <div class="hp-ab-grid hp-ab-grid--3">
+          <article class="hp-ab-card">
+            <h3>Conceptual Mastery</h3>
+            <p>Students learn why a method works before they practise it, so formulas become tools rather than things to memorise. Each new concept is connected to ideas students already understand.</p>
+          </article>
+          <article class="hp-ab-card">
+            <h3>Practice With Feedback</h3>
+            <p>Regular, purposeful practice helps students notice their own mistakes while those mistakes are still easy to correct. Feedback is clear, specific, and always aimed at the next step.</p>
+          </article>
+          <article class="hp-ab-card">
+            <h3>Confidence Over Memorisation</h3>
+            <p>Confidence grows when students can explain their thinking, not only produce an answer. The goal is a steady, independent approach to unfamiliar problems.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="hp-ab-section hp-ab-dark" aria-labelledby="career-heading">
+      <div class="hp-wrap">
+        <p class="hp-ab-eyebrow">03 / Public education</p>
+        <h2 id="career-heading" class="hp-ab-h2">A career in public education</h2>
+        <ol class="hp-ab-timeline">
+          <li>
+            <!-- CONFIRM WITH SUREN SIR: 2012 as the year he began teaching -->
+            <span class="hp-ab-year">2012</span>
+            <h3>Began teaching</h3>
+            <p>Started teaching mathematics in a public school, building a foundation of clear explanation and patient support.</p>
+          </li>
+          <li>
+            <!-- CONFIRM WITH SUREN SIR: teaching mathematics to Grades 9–12 -->
+            <span class="hp-ab-year">Since then</span>
+            <h3>Teaching Grades 9–12</h3>
+            <p>Teaching mathematics across secondary grades, guiding students from foundational algebra to senior secondary topics.</p>
+          </li>
+          <li>
+            <!-- CONFIRM WITH SUREN SIR: preparation for SEE and Loksewa/Shikshak Sewa exams -->
+            <span class="hp-ab-year">Recent years</span>
+            <h3>Exam preparation</h3>
+            <p>Helping students prepare for SEE and Loksewa/Shikshak Sewa examinations through structured practice and feedback.</p>
+          </li>
+          <li>
+            <!-- CONFIRM WITH SUREN SIR: building this platform in 2026 -->
+            <span class="hp-ab-year">2026</span>
+            <h3>Building this platform</h3>
+            <p>Building this online learning platform so notes, assignments, and worked solutions can support students beyond the classroom.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="hp-ab-section hp-ab-cream" aria-labelledby="students-heading">
+      <div class="hp-wrap">
+        <p class="hp-ab-eyebrow hp-ab-eyebrow--dark">04 / Students</p>
+        <h2 id="students-heading" class="hp-ab-h2">Who I teach</h2>
+        <p class="hp-ab-intro">Choose the class or examination you are preparing for and continue to the matching learning page.</p>
+        {% url 'core:coming_soon' as u_grade_9 %}
+        {% url 'core:coming_soon' as u_grade_10 %}
+        {% url 'core:coming_soon' as u_grade_11 %}
+        {% url 'core:coming_soon' as u_grade_12 %}
+        {% url 'core:coming_soon' as u_loksewa %}
+        {% url 'core:coming_soon' as u_shikshak_sewa %}
+        <div class="hp-ab-links">
+          <a class="hp-ab-link" href="{{ u_grade_9|default:'#' }}">
+            <span>Grade</span>
+            <strong>9</strong>
+            <small>Mathematics foundations</small>
+          </a>
+          <a class="hp-ab-link" href="{{ u_grade_10|default:'#' }}">
+            <span>Grade</span>
+            <strong>10</strong>
+            <small>SEE preparation</small>
+          </a>
+          <a class="hp-ab-link" href="{{ u_grade_11|default:'#' }}">
+            <span>Grade</span>
+            <strong>11</strong>
+            <small>Senior secondary mathematics</small>
+          </a>
+          <a class="hp-ab-link" href="{{ u_grade_12|default:'#' }}">
+            <span>Grade</span>
+            <strong>12</strong>
+            <small>Advanced mathematics</small>
+          </a>
+          <a class="hp-ab-link" href="{{ u_loksewa|default:'#' }}">
+            <span>Public service</span>
+            <strong>Loksewa</strong>
+            <small>Preparation support</small>
+          </a>
+          <a class="hp-ab-link" href="{{ u_shikshak_sewa|default:'#' }}">
+            <span>Teaching service</span>
+            <strong>Shikshak Sewa</strong>
+            <small>Preparation support</small>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="hp-ab-section hp-ab-cream hp-ab-section--help" aria-labelledby="help-heading">
+      <div class="hp-wrap">
+        <p class="hp-ab-eyebrow hp-ab-eyebrow--dark">05 / Learning support</p>
+        <h2 id="help-heading" class="hp-ab-h2">How this platform helps</h2>
+        <div class="hp-ab-help">
+          <article>
+            <h3>Notes</h3>
+            <p>Clear, organised explanations that make each topic easier to revise.</p>
+          </article>
+          <article>
+            <h3>Assignments</h3>
+            <p>Structured practice that builds accuracy and steady study habits.</p>
+          </article>
+          <article>
+            <h3>Practice Questions</h3>
+            <p>Varied problems that prepare students for classroom and board examinations.</p>
+          </article>
+          <article>
+            <h3>Worked Solutions</h3>
+            <p>Step-by-step solutions that show how to reason through a problem.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="hp-ab-cta" aria-labelledby="about-cta-heading">
+      <div class="hp-wrap hp-ab-cta-inner">
+        <h2 id="about-cta-heading">Let's Make Mathematics Clearer.</h2>
+        <a class="hp-ab-cta-btn" href="{% if site_settings.contact_email %}mailto:{{ site_settings.contact_email }}{% else %}{% url 'core:coming_soon' %}{% endif %}">
+          Contact
+          <svg class="hp-i" aria-hidden="true"><use href="#hp-arrow-r"/></svg>
+        </a>
+      </div>
+    </section>
+  </div>
+{% endblock content %}
+
+{% block site_footer %}
+  {% include "core/partials/_site_footer.html" with hide_cta=True %}
+{% endblock site_footer %}
+
+{% block scripts %}
+  <script src="{% static 'js/home.js' %}" defer></script>
+{% endblock scripts %}

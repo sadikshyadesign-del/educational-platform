@@ -117,6 +117,16 @@ def home_view(request):
 
 
 @require_http_methods(["GET"])
+def about_view(request):
+    """Public About page for Suren Chhetri."""
+    return render(
+        request,
+        "core/about.html",
+        {"portrait_available": bool(finders.find("site/img/suren-portrait.jpg"))},
+    )
+
+
+@require_http_methods(["GET"])
 def robots_txt_view(request):
     """
     Serves plain-text robots.txt disallowing sensitive private paths and pointing to sitemap.

@@ -1033,6 +1033,12 @@ ACCESS_MATRIX: dict[str, RouteAccessSpec] = {
         methods=("GET",),
         description="Public placeholder page for unfinished homepage destinations",
     ),
+    "about": RouteAccessSpec(
+        route_key="about",
+        classification="public",
+        methods=("GET",),
+        description="Public About page for Suren Chhetri",
+    ),
     "core:privacy": RouteAccessSpec(
         route_key="core:privacy",
         classification="public",

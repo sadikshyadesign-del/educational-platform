@@ -1,0 +1,51 @@
+{% load static %}
+<footer class="hp-footer" id="contact">
+  {% if footer_image_available %}
+    <img class="hp-footer-bg" src="{% static 'home/images/footer.webp' %}" alt="" aria-hidden="true" loading="lazy" width="1601">
+  {% elif footer_jpg_available %}
+    <img class="hp-footer-bg" src="{% static 'home/images/footer.jpg' %}" alt="" aria-hidden="true" loading="lazy" width="1601">
+  {% endif %}
+  <div class="hp-wrap">
+    {% if not hide_cta %}
+      <div class="hp-cta">
+        <h2>Let's Make Mathematics Clearer.</h2>
+        <a href="{% if site_settings.contact_email %}mailto:{{ site_settings.contact_email }}{% else %}{% url 'core:coming_soon' %}{% endif %}">Contact <svg class="hp-i" aria-hidden="true"><use href="#hp-arrow-r"/></svg></a>
+      </div>
+    {% endif %}
+    <div class="hp-fgrid">
+      <div class="hp-fbrand">
+        <b>{{ site_settings.site_name|default:"Suren" }}</b>
+        <p>Mathematics teacher helping students in Grades 9–12 build understanding and confidence.</p>
+      </div>
+      <div class="hp-fcols">
+        <div>
+          <h3>Mathematics</h3>
+          <ul>
+            <li><a href="{% url 'core:coming_soon' %}">Grade 9</a></li>
+            <li><a href="{% url 'core:coming_soon' %}">Grade 10</a></li>
+            <li><a href="{% url 'core:coming_soon' %}">Grade 11</a></li>
+            <li><a href="{% url 'core:coming_soon' %}">Grade 12</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Exam Preparation</h3>
+          <ul>
+            <li><a href="{% url 'core:coming_soon' %}">Loksewa</a></li>
+            <li><a href="{% url 'core:coming_soon' %}">Shikshak Sewa</a></li>
+            <li><a href="{% url 'core:coming_soon' %}">All resources</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Connect</h3>
+          <ul>
+            <li><a href="{% url 'about' %}">About me</a></li>
+            <li><a href="{% if site_settings.contact_email %}mailto:{{ site_settings.contact_email }}{% else %}{% url 'core:coming_soon' %}{% endif %}">Contact</a></li>
+          </ul>
+          {% if site_settings.contact_email %}
+            <p class="hp-contact-email"><a href="mailto:{{ site_settings.contact_email }}">{{ site_settings.contact_email }}</a></p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
