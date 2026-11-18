@@ -4,15 +4,8 @@
 {% block title %}{% trans "Grade Submission" %} - {{ submission.student.get_full_name|default:submission.student.email }} — {{ site_settings.site_name }}{% endblock %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}">{{ course.title }}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_course_assignment_submissions' slug=course.slug assignment_id=assignment.id %}">{{ assignment.title }}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{% trans "Grade Submission" %}</span>
-</nav>
+{% url 'dashboard:teacher_submissions' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Submissions</a><span>/</span><span aria-current="page">Grade submission</span></nav>
 {% endblock %}
 
 {% block page_title %}{{ submission.student.get_full_name|default:submission.student.email }}{% endblock %}
@@ -22,16 +15,14 @@
 {% endblock %}
 
 {% block header_actions %}
+{% url 'dashboard:teacher_submissions' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Submissions" %}
 {% if next_ungraded %}
   <a href="{% url 'dashboard:teacher_submission_grade' submission_id=next_ungraded.id %}" class="sp-btn sp-btn--secondary">
     <span>{% trans "Skip to Next Ungraded" %}</span>
     <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-chevron-right"/></svg>
   </a>
 {% endif %}
-<a href="{% url 'dashboard:teacher_course_assignment_submissions' slug=course.slug assignment_id=assignment.id %}" class="sp-btn sp-btn--secondary">
-  <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-back"/></svg>
-  <span>{% trans "Back" %}</span>
-</a>
 {% endblock %}
 
 {% block content %}

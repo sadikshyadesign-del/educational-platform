@@ -4,27 +4,16 @@
 {% block title %}{% trans "Missed Deadlines" %} - {{ assignment.title }} — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">{% trans "Teacher Portal" %}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_courses' %}">{% trans "Courses" %}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}">{{ course.title }}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_course_assignment_submissions' slug=course.slug assignment_id=assignment.id %}">{{ assignment.title }}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{% trans "Missed Deadlines" %}</span>
-</nav>
+{% url 'dashboard:teacher_submissions' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Submissions</a><span>/</span><span aria-current="page">Missed deadlines</span></nav>
 {% endblock %}
 
 {% block page_title %}{% trans "Missed Deadlines" %}{% endblock %}
 {% block page_subtitle %}{% trans "Active enrolled students who have not turned in this assignment." %}{% endblock %}
 
 {% block header_actions %}
-<a href="{% url 'dashboard:teacher_course_assignment_submissions' slug=course.slug assignment_id=assignment.id %}" class="sp-btn sp-btn--secondary">
-  <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-back"/></svg>
-  <span>{% trans "Back to Submissions" %}</span>
-</a>
+{% url 'dashboard:teacher_submissions' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Submissions" %}
 {% endblock %}
 
 {% block content %}

@@ -4,19 +4,16 @@
 {% block title %}Manage Policy: {{ item.title }} — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_course_materials' course.slug %}">Materials</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">Policy: {{ item.title }}</span>
-</nav>
+{% url 'dashboard:teacher_course_materials' course.slug as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Materials</a><span>/</span><span aria-current="page">Download policy</span></nav>
 {% endblock %}
 
 {% block page_title %}Download Access Policy{% endblock %}
 {% block page_subtitle %}File: <strong>{{ item.title }}</strong> ({{ item.original_filename|default:item.file.name }}){% endblock %}
 
 {% block header_actions %}
+{% url 'dashboard:teacher_course_materials' course.slug as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Materials" %}
 {% if item.download_policy == 'view_only' %}
   <span class="sp-badge">Current: {{ item.get_download_policy_display }}</span>
 {% elif item.download_policy == 'open_to_enrolled' %}

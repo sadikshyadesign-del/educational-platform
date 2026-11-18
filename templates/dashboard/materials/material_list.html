@@ -3,19 +3,16 @@
 {% block title %}Materials: {{ course.title }} — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_courses' %}">Courses</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{{ course.title }} Materials</span>
-</nav>
+{% url 'dashboard:teacher_materials' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Materials</a><span>/</span><span aria-current="page">Course materials</span></nav>
 {% endblock %}
 
 {% block page_title %}Course Materials{% endblock %}
 {% block page_subtitle %}Course: <strong>{{ course.title }}</strong> (/{{ course.slug }}){% endblock %}
 
 {% block header_actions %}
+{% url 'dashboard:teacher_materials' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Materials" %}
 <span class="sp-badge">{{ total_count }} Post{{ total_count|pluralize }} &bull; {{ total_items }} Item{{ total_items|pluralize }}</span>
 <a href="{% url 'dashboard:teacher_course_lessons' course.slug %}" class="sp-btn sp-btn--secondary">
   View Lessons

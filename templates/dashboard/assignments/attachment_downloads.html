@@ -3,25 +3,16 @@
 {% block title %}Downloads: {{ attachment.title }} — {{ assignment.title }} — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_courses' %}">Courses</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_course_assignment_edit' slug=course.slug assignment_id=assignment.id %}">{{ assignment.title }}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">Attachment Downloads</span>
-</nav>
+{% url 'dashboard:teacher_assignments' course.slug as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Assignments</a><span>/</span><span aria-current="page">Attachment downloads</span></nav>
 {% endblock %}
 
 {% block page_title %}Download History: {{ attachment.title }}{% endblock %}
 {% block page_subtitle %}Assignment: <strong>{{ assignment.title }}</strong> &bull; Course: <strong>{{ course.title }}</strong>{% endblock %}
 
 {% block header_actions %}
-<a href="{% url 'dashboard:teacher_course_assignment_edit' slug=course.slug assignment_id=assignment.id %}" class="sp-btn sp-btn--secondary">
-  <svg class="sp-i" aria-hidden="true"><use href="#i-back"/></svg>
-  <span>Back to Assignment</span>
-</a>
+{% url 'dashboard:teacher_assignments' course.slug as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Assignments" %}
 {% endblock %}
 
 {% block content %}

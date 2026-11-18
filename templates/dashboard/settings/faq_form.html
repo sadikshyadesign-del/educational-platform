@@ -3,17 +3,17 @@
 {% block title %}{% if is_create %}New FAQ Question{% else %}Edit FAQ: {{ faq.question }}{% endif %} — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_faqs' %}">FAQs</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{% if is_create %}New Question{% else %}Edit Question{% endif %}</span>
-</nav>
+{% url 'dashboard:teacher_faqs' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">FAQs</a><span>/</span><span aria-current="page">{% if is_create %}Create FAQ{% else %}Edit FAQ{% endif %}</span></nav>
 {% endblock %}
 
 {% block page_title %}{% if is_create %}New FAQ Question{% else %}Edit FAQ Question{% endif %}{% endblock %}
 {% block page_subtitle %}Displayed in the Frequently Asked Questions accordion on the public homepage.{% endblock %}
+
+{% block header_actions %}
+{% url 'dashboard:teacher_faqs' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="FAQs" %}
+{% endblock %}
 
 {% block content %}
 <div class="sp-card sp-pad sp-max">

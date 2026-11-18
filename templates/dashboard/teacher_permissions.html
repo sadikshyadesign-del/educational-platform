@@ -2,21 +2,12 @@
 
 {% block title %}Download Permissions Queue — {{ site_settings.site_name }}{% endblock title %}
 
+{% block breadcrumb %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><span aria-current="page">Permissions</span></nav>
+{% endblock %}
+
 {% block dashboard_content %}
 <div>
-  <!-- Breadcrumb Navigation -->
-  <nav class="mb-6 flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400" aria-label="Breadcrumb">
-    <a href="{% url 'dashboard:teacher' %}" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-      Teacher Portal
-    </a>
-    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-    <span class="font-medium text-slate-900 dark:text-white" aria-current="page">
-      Download Permissions
-    </span>
-  </nav>
-
   <!-- Page Header -->
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
     <div>

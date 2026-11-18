@@ -3,19 +3,16 @@
 {% block title %}Assignments: {{ course.title }} — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_courses' %}">Courses</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{{ course.title }} Assignments</span>
-</nav>
+{% url 'dashboard:teacher_courses' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Courses</a><span>/</span><span aria-current="page">Assignments</span></nav>
 {% endblock %}
 
 {% block page_title %}Course Assignments{% endblock %}
 {% block page_subtitle %}Course: <strong>{{ course.title }}</strong> (/{{ course.slug }}){% endblock %}
 
 {% block header_actions %}
+{% url 'dashboard:teacher_courses' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Courses" %}
 <span class="sp-badge">{{ assignments|length }} Assignment{{ assignments|length|pluralize }}</span>
 <a href="{% url 'dashboard:teacher_course_edit' course.slug %}" class="sp-btn sp-btn--secondary">
   Course Settings

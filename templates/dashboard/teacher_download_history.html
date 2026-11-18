@@ -3,24 +3,17 @@
 {% block title %}Audit Download History: {{ item.title }} — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_permissions' %}">Permissions Queue</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">Audit Download History</span>
-</nav>
+{% url 'dashboard:teacher_permissions' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Permissions</a><span>/</span><span aria-current="page">Download history</span></nav>
 {% endblock %}
 
 {% block page_title %}Download History{% endblock %}
 {% block page_subtitle %}{{ course.title }} &bull; <strong>{{ item.title }}</strong>{% endblock %}
 
 {% block header_actions %}
+{% url 'dashboard:teacher_permissions' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Permissions" %}
 <span class="sp-badge">{{ logs|length }} Total Downloads</span>
-<a href="{% url 'dashboard:teacher_permissions' %}" class="sp-btn sp-btn--secondary">
-  <svg class="sp-i" aria-hidden="true"><use href="#i-back"/></svg>
-  <span>Back to Queue</span>
-</a>
 {% endblock %}
 
 {% block content %}

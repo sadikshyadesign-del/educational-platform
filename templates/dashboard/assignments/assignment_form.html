@@ -4,19 +4,17 @@
 {% block title %}{% if is_create %}Create Assignment{% else %}Edit Assignment: {{ assignment.title }}{% endif %} — {{ course.title }} — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_courses' %}">Courses</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_assignments' course.slug %}">{{ course.title }} Assignments</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{% if is_create %}New Assignment{% else %}Edit Assignment{% endif %}</span>
-</nav>
+{% url 'dashboard:teacher_assignments' course.slug as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Assignments</a><span>/</span><span aria-current="page">{% if is_create %}Create assignment{% else %}Edit assignment{% endif %}</span></nav>
 {% endblock %}
 
 {% block page_title %}{% if is_create %}Create Assignment in {{ course.title }}{% else %}Edit Assignment: {{ assignment.title }}{% endif %}{% endblock %}
 {% block page_subtitle %}Configure title, associated lesson, instructions, deadlines, and maximum score.{% endblock %}
+
+{% block header_actions %}
+{% url 'dashboard:teacher_assignments' course.slug as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Assignments" %}
+{% endblock %}
 
 {% block content %}
 <div class="sp-stack sp-max">

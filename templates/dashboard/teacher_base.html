@@ -229,6 +229,7 @@
 
     <!-- Main Content Area -->
     <main class="lg:col-span-9 min-w-0" id="main-content">
+      {% block breadcrumb %}{% endblock %}
       {% block dashboard_content %}{% endblock dashboard_content %}
     </main>
   </div>

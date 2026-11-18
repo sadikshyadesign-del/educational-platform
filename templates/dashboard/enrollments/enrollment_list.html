@@ -4,11 +4,7 @@
 {% block title %}{% trans "Enrollment Management" %} — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">{% trans "Teacher Portal" %}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{% trans "Enrollment Management" %}</span>
-</nav>
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><span aria-current="page">Enrollments</span></nav>
 {% endblock %}
 
 {% block page_title %}{% trans "Enrollment Management" %}{% endblock %}

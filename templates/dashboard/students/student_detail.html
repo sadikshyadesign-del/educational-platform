@@ -4,13 +4,8 @@
 {% block title %}{{ student.get_full_name|default:student.email }} - {% trans "Student Profile" %} — {{ site_settings.site_name }}{% endblock %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <a href="{% url 'dashboard:teacher_students' %}">{% trans "Student Directory" %}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">{{ student.email }}</span>
-</nav>
+{% url 'dashboard:teacher_students' as u_parent %}
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Students</a><span>/</span><span aria-current="page">Student detail</span></nav>
 {% endblock %}
 
 {% block page_title %}{{ student.get_full_name|default:student.email }}{% endblock %}
@@ -24,6 +19,8 @@
 {% endblock %}
 
 {% block header_actions %}
+{% url 'dashboard:teacher_students' as u_back %}
+{% include "teacher/partials/_back.html" with href=u_back label="Students" %}
 {% if can_toggle_active %}
   <button
     type="button"
@@ -39,11 +36,6 @@
     {% endif %}
   </button>
 {% endif %}
-
-<a href="{% url 'dashboard:teacher_students' %}" class="sp-btn sp-btn--secondary">
-  <svg class="sp-i sp-i--sm" aria-hidden="true"><use href="#i-back"/></svg>
-  <span>{% trans "Back" %}</span>
-</a>
 {% endblock %}
 
 {% block content %}

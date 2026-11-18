@@ -6,19 +6,12 @@
 {% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">{% trans "Teacher Portal" %}</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  {% if assignment %}
-    <a href="{% url 'dashboard:teacher_courses' %}">{% trans "Courses" %}</a>
-    <span aria-hidden="true">&rsaquo;</span>
-    <a href="{% url 'dashboard:teacher_course_assignments' slug=course.slug %}">{{ course.title }}</a>
-    <span aria-hidden="true">&rsaquo;</span>
-    <span aria-current="page">{{ assignment.title }}</span>
-  {% else %}
-    <span aria-current="page">{% trans "Submissions Queue" %}</span>
-  {% endif %}
-</nav>
+{% if assignment %}
+  {% url 'dashboard:teacher_submissions' as u_parent %}
+  <nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><a href="{{ u_parent }}">Submissions</a><span>/</span><span aria-current="page">{{ assignment.title }}</span></nav>
+{% else %}
+  <nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><span aria-current="page">Submissions</span></nav>
+{% endif %}
 {% endblock %}
 
 {% block page_title %}
@@ -35,6 +28,8 @@
 
 {% block header_actions %}
 {% if assignment %}
+  {% url 'dashboard:teacher_submissions' as u_back %}
+  {% include "teacher/partials/_back.html" with href=u_back label="Submissions" %}
   <a
     href="{% url 'dashboard:teacher_missed_deadlines' slug=course.slug assignment_id=assignment.id %}"
     class="sp-btn sp-btn--danger-outline"

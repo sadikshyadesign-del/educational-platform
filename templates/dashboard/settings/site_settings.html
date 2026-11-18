@@ -3,11 +3,7 @@
 {% block title %}Site Settings — Teacher Portal — {{ site_settings.site_name }}{% endblock title %}
 
 {% block breadcrumb %}
-<nav class="sp-crumbs" aria-label="Breadcrumb">
-  <a href="{% url 'dashboard:teacher' %}">Teacher Portal</a>
-  <span aria-hidden="true">&rsaquo;</span>
-  <span aria-current="page">Site Settings</span>
-</nav>
+<nav class="sp-crumbs" aria-label="Breadcrumb"><a href="/dashboard/teacher/">Overview</a><span>/</span><span aria-current="page">Site Settings</span></nav>
 {% endblock %}
 
 {% block page_title %}Site Settings{% endblock %}
